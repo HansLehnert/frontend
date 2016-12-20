@@ -1,0 +1,209 @@
+#include "Scrapper.h"
+
+#include <map> 
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <cctype>
+#include <curl/curl.h>
+
+#include "rapidxml/rapidxml.hpp"
+#include "Config.h"
+
+//Callback for curl
+size_t write_callback(char* data, size_t size, size_t nmemb, void* dest) {
+	std::string* dest_string = (std::string*)dest;
+	int dest_size = dest_string->size();
+
+	dest_string->append(data, nmemb);
+	
+	return dest_string->size() - dest_size;
+}
+
+
+void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<std::string, Config>* emulator_list) {
+	std::map<std::string, char*> dat_files_src;
+	std::map<std::string, rapidxml::xml_document<>> dat_xml_doc;
+	std::map<std::string, rapidxml::xml_node<>*> dat_xml_root;
+
+	std::cout << "[Scrapper]\tUsing thegamesdb.net" << std::endl;
+
+	curl_global_init(CURL_GLOBAL_ALL);
+	CURL* curl_handle = curl_easy_init();
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+
+	std::cout << "[Scrapper]\tLoading .dat files" << std::endl;
+	for (auto i : *emulator_list) {
+		int dat_exists;
+		std::string dat_path = i.second.getValue("dat_file", &dat_exists);
+
+		if (dat_exists != -1) {
+			std::cout << "[Scrapper]\tFor emulator "
+			          << i.first
+			          << " reading "
+			          << dat_path
+			          << std::endl;
+
+			std::ifstream dat_file(dat_path);
+
+			if (!dat_file.is_open()) {
+				std::cout << "\t\tFailed to open" << std::endl;
+				continue;
+			}
+
+			int file_size;
+			dat_file.seekg(0, dat_file.end);
+			file_size = dat_file.tellg();
+
+			dat_file.seekg(0, dat_file.beg);
+			dat_files_src[i.first] = new char[file_size + 1];
+			dat_file.get(dat_files_src[i.first], file_size + 1, '\0');
+			dat_file.close();
+
+			try {
+				dat_xml_doc[i.first].parse<0>(dat_files_src[i.first]);
+				dat_xml_root[i.first] = dat_xml_doc[i.first].first_node();
+			}
+			catch (rapidxml::parse_error error) {
+				std::cout << error.what() << " at " << (int)(error.where<char>() - dat_files_src[i.first]) << std::endl;
+			}
+		}
+	}
+	
+	for (auto i : *game_list) {
+		std::string game_name = i.second.getValue("game_name");
+		std::string game_logo = i.second.getValue("game_logo");
+		std::string game_art = i.second.getValue("game_art");
+
+		std::cout << "[Scrapper]\tLooking up " << i.first << std::endl;
+
+		if (game_name == "") {
+			std::cout << "\t\tMissing name" << std::endl;
+
+			std::string emulator = i.second.getValue("emulator");
+			if (dat_xml_root.find(emulator) == dat_xml_root.end())
+				continue;
+
+			for (rapidxml::xml_node<>* node = dat_xml_root[emulator]->first_node("game"); node; node = node->next_sibling("game")) {
+				rapidxml::xml_attribute<>* attr_name = node->first_attribute("name");
+				if (attr_name && i.first == attr_name->value()) {
+					game_name = node->first_node("description")->value();
+					i.second.setValue("game_name", game_name);
+					std::cout << "\t\tNew name: " << game_name << std::endl;
+					break;
+				}
+			}
+		}
+
+		if (game_name == "")
+			continue;
+
+		//Remove punctuation, version from name
+		std::string game_clear_name;
+		for (unsigned int i = 0; i < game_name.length(); i++) {
+			if (!ispunct(game_name[i]))
+				game_clear_name += game_name[i];
+			else if (game_name[i] == '-' || game_name[i] == '(')
+				break;
+			else
+				game_clear_name += " ";
+		}
+		while (isspace(game_clear_name.back()))
+			game_clear_name.erase(--game_clear_name.end());
+
+		if (game_logo == "") {
+			std::cout << "\t\tMissing logo" << std::endl;
+
+			std::string api_response;
+			std::string api_request = "http://www.thegamesdb.net/api/GetGame.php?name=";
+
+			char* encoded_name = curl_easy_escape(curl_handle, game_clear_name.c_str(), 0);
+			api_request += encoded_name;
+			curl_free(encoded_name);
+
+			if (!getFile(api_request, &api_response, curl_handle))
+				continue;
+
+			int api_response_size = api_response.size();
+			char* xml_source;
+
+			//Copy response to non-const string
+			xml_source = new char[api_response_size + 1];
+			strncpy(xml_source, api_response.c_str(), api_response_size);
+			xml_source[api_response_size] = '\0';
+
+			//Parse data
+			rapidxml::xml_document<> game_info_xml;
+			game_info_xml.parse<0>(xml_source);
+
+			//Get main node
+			rapidxml::xml_node<>* data_node = game_info_xml.first_node("Data");
+
+			std::string base_image_url = data_node->first_node("baseImgUrl")->value();
+			std::string logo_url = "";
+
+			for (rapidxml::xml_node<>* node = data_node->first_node("Game"); node; node = node->next_sibling("Game")) {
+				std::string game_platform = node->first_node("Platform")->value();
+				std::string game_title = node->first_node("GameTitle")->value();
+				rapidxml::xml_node<>* images_node = node->first_node("Images");
+
+				if (images_node == NULL)
+					continue;
+
+				rapidxml::xml_node<>* logo_node = images_node->first_node("clearlogo");
+
+				if (logo_node != NULL && ((game_platform == "Arcade" && logo_url == "") || game_title == game_clear_name)) {
+					logo_url = logo_node->value();
+					if (game_platform == "Arcade" && game_title == game_clear_name)
+						break;
+				}
+			}
+
+			if (logo_url != "") {
+				std::string logo_filename = "logo/" + i.first + ".png";
+				if (saveFile(base_image_url + logo_url, logo_filename, curl_handle)) {
+					i.second.setValue("game_logo", logo_filename);
+					std::cout << "\t\tLogo found" << std::endl;
+				}
+			}
+
+			game_info_xml.clear();
+		}
+
+		i.second.write();
+	}
+
+	curl_global_cleanup();
+}
+
+int Scrapper::getFile(std::string url, std::string* dest, CURL* handle) {
+	curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
+	curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void*)dest);
+
+	int curl_status;
+	long http_status;
+
+	curl_status = curl_easy_perform(handle);
+	curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_status);
+	if (curl_status == CURLE_OK && http_status == 200)
+		return 1;
+	else
+		return 0;
+}
+
+int Scrapper::saveFile(std::string url, std::string filename, CURL* handle) {
+	std::string data;
+	if (getFile(url, &data, handle)) {
+		std::ofstream file(filename);
+		if (file.is_open()) {
+			file.write(data.c_str(), data.size());
+			file.close();
+			return 1;
+		}
+
+		return 0;
+	}
+
+	return 0;
+}
