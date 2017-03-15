@@ -70,21 +70,11 @@ Image::Image(std::string image_file) {
 	}
 };
 
-void Image::setPosition(glm::vec2 position) {
-	model_matrix[3][0] = position.x;
-	model_matrix[3][1] = position.y;
-}
-
-void Image::setScale(glm::vec2 scale) {
-	model_matrix[0][0] = scale.x;
-	model_matrix[1][1] = scale.y;
-}
-
 void Image::setSize(glm::vec2 size) {
 	if (size.x / size.y > shape)
-		setScale(glm::vec2(size.y * shape, size.y));
+		setScale(glm::vec3(size.y * shape, size.y, 1));
 	else
-		setScale(glm::vec2(size.x, size.x / shape));
+		setScale(glm::vec3(size.x, size.x / shape, 1));
 }
 
 int Image::setContent(std::string image_file) {

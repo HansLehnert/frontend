@@ -9,22 +9,18 @@
 #include <stdlib.h>
 #include <SDL2/SDL_keycode.h>
 
+#include "core/Event.h"
 #include "Config.h"
-#include "Message.h"
 #include "Scrapper.h"
 #include "objects/Image.h"
 
-const char* rom_ext = ".png";
+const char* rom_ext = ".zip";
 
 GameManager::GameManager(std::string rom_path) {
 	init(rom_path);
 	selection = game_list.begin();
 
-	Message input_request;
-	input_request.type = FE_INPUT;
-	input_request.input.source = this;
-	input_request.input.event = FE_START_LISTEN;
-	sendMessageAll(input_request);
+	addListener(EVENT_INPUT_KEYDOWN);
 
 	game_title.setScale(glm::vec2(0.05, 0.08));
 	game_title.setSpacing(0.2);
@@ -39,25 +35,30 @@ void GameManager::init(std::string rom_path) {
 	DIR *dir;
 	struct dirent *ent;
 
+	//Find ROMs in rom folder
 	dir = opendir(rom_path.c_str());
 	if (dir != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
 			std::string file_name = ent->d_name;
 			auto ext_point = file_name.find('.');
 
+			//Check if file has extension
+			if (ext_point == std::string::npos)
+				continue;
+
 			std::string game_name = file_name.substr(0, ext_point);
 			std::string extension = file_name.substr(ext_point);
 
 			if (extension == rom_ext) {
 				Config game_config("game/" + game_name);
-				int has_value;
+				bool has_value;
 
 				game_config.getValue("emulator", &has_value);
-				if (has_value == -1)
-					game_config.setValue("emulator", "fba");
+				if (!has_value)
+					game_config.setValue("emulator", "mame");
 
 				game_config.getValue("launch_options", &has_value);
-				if (has_value == -1)
+				if (!has_value)
 					game_config.setValue("launch_options", "");
 
 				game_config.write();
@@ -68,9 +69,10 @@ void GameManager::init(std::string rom_path) {
 		closedir(dir);
 	}
 	else {
-		std::cout << "Invalid rom path";
+		std::cout << "[GameManager]\tInvalid rom path" << std::endl;
 	}
 
+	//Read emulator configuration
 	dir = opendir("emulator");
 	if (dir != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
@@ -136,9 +138,9 @@ void GameManager::updateUI() {
 	}
 }
 
-void GameManager::sendMessage(Message message) {
-	if (message.type == FE_INPUT && message.input.event == FE_KEY_DOWN) {
-		switch (message.input.value) {
+void GameManager::handleEvent(Event& event) {
+	if (event.type == EVENT_INPUT_KEYDOWN) {
+		switch (event.input.keycode) {
 			case SDLK_DOWN:
 				if (selection != (--game_list.end()))
 					selection++;

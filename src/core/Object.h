@@ -1,9 +1,12 @@
 #pragma once
 
+#include <vector>
 #include <list>
+
 #include <SDL2/SDL.h>
 #include "glm/glm.hpp"
-#include "Message.h"
+
+#include "Event.h"
 
 class Object {
 public:
@@ -11,17 +14,44 @@ public:
 	~Object();
 
 	virtual void update() {};
-	virtual void render() {};
-	virtual void sendMessage(Message) {};
-
 	static void updateAll();
+
+	virtual void render() {};
 	static void renderAll();
-	static void sendMessageAll(Message);
+
+	void addListener(EventType);
+	void removeListener(EventType);
+	void dispatchEvent(Event&);
+	virtual void handleEvent(Event&) {};
 
 	static glm::mat4 world_matrix;
+
+	///////////////////////////////////////////////////////////////////////////
+	//Graphic members
+	///////////////////////////////////////////////////////////////////////////
+	bool visible;
+
+	void setPosition(glm::vec3);
+	glm::vec3 getPosition();
+
+	void setScale(glm::vec3);
+	glm::vec3 getScale();
+
+protected:
+
+	///////////////////////////////////////////////////////////////////////////
+	//Graphic members
+	///////////////////////////////////////////////////////////////////////////
+
+	glm::vec3 position;
+	glm::vec3 scale;
 	glm::mat4 model_matrix;
-	int visible;
+
+	void computeModelMatrix();
+
 private:
 	static std::list<Object*> object_list;
-	std::list<Object*>::iterator list_pos;
+	std::list<Object*>::iterator list_pos; //Stores position in list
+
+	static std::vector<std::list<Object*> > listener;
 };

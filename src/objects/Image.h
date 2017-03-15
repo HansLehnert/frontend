@@ -13,8 +13,6 @@ public:
 	
 	virtual void render();
 
-	void setPosition(glm::vec2);
-	void setScale(glm::vec2);
 	int setContent(std::string);
 	void setSize(glm::vec2);
 private:

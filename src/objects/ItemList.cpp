@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include "glm/glm.hpp"
-#include "Message.h"
 
 ItemList::ItemList(std::vector<std::string> list) : items(list) {
 	selection = items.begin();

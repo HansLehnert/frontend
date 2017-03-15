@@ -7,11 +7,14 @@ class Config {
 public:
 	Config(std::string);
 	
-	int load();
-	int write();
+	bool load();
+	bool write();
 
 	void setValue(std::string, std::string);
-	std::string getValue(std::string, int* = NULL);
+
+
+	std::string getValue(std::string, bool* = NULL);
+	std::string operator[](std::string);
 private:
 	std::string filename;
 	std::map<std::string, std::string> settings;

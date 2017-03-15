@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <string>
+
+#include <unistd.h>
 
 #include "Context.h"
 #include "Config.h"
@@ -10,12 +13,35 @@
 #include "objects/Background.h"
 #include "objects/Image.h"
 
-int main(void) {
+
+//Creates directory
+//(Currently only works on UNIX system)
+bool createDir(std::string dir) {
+	std::string command = "mkdir " + dir;
+
+	if (system(command.c_str()) == 0)
+		return true;
+	else
+		return false;
+}
+
+
+int main() {
 	Context context;
 	context.init();
 
+	//Create folders
+	createDir("game");
+	createDir("emulator");
+	createDir("logo");
+	createDir("dat");
+
+
 	Config main_config("settings");
-	GameManager game_manager(main_config.getValue("rom_path"));
+	main_config["rom_path"] = main_config["rom_path"];
+	main_config.write();
+
+	GameManager game_manager(main_config["rom_path"]);
 
 	Background background(6);
 

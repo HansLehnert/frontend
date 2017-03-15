@@ -34,10 +34,10 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 
 	std::cout << "[Scrapper]\tLoading .dat files" << std::endl;
 	for (auto i : *emulator_list) {
-		int dat_exists;
+		bool dat_exists;
 		std::string dat_path = i.second.getValue("dat_file", &dat_exists);
 
-		if (dat_exists != -1) {
+		if (dat_exists) {
 			std::cout << "[Scrapper]\tFor emulator "
 			          << i.first
 			          << " reading "
@@ -126,7 +126,8 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 
 			std::cout << "Clean name:\t" << clear_name << std::endl;
 
-			int found = 0;
+			//Search logo
+			bool found = false;
 			for (pugi::xml_node node : info_xml.child("Data").children("Game")) {
 				std::string entry_name = cleanName(node.child("GameTitle").child_value());
 				int platform_id = node.child("PlatformId").text().as_int();
@@ -136,7 +137,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 				if (entry_name == clear_name) {
 					if (node.child("Images").child("clearlogo")) {
 						logo_url = node.child("Images").child("clearlogo").child_value();
-						found = 1;
+						found = true;
 
 						if (platform_id == 23)
 							break;
@@ -152,18 +153,16 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 					if (entry_name == clear_name) {
 						if (node.child("Images").child("clearlogo")) {
 							logo_url = node.child("Images").child("clearlogo").child_value();
-							found = 1;
+							found = true;
 
 							if (platform_id == 23)
 								break;
 						}
 					}
 				}
-
-				if (found)
-					break;
 			}
 
+			//Save logo
 			if (found) {
 				std::string logo_filename = "logo/" + i.first + ".png";
 				if (saveFile(base_img_url + logo_url, logo_filename, curl_handle)) {

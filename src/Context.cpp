@@ -5,7 +5,7 @@
 #include <SDL2/SDL_opengl.h>
 #include <iostream>
 
-#include "Message.h"
+#include "core/Event.h"
 
 int Context::sdl_init = 0;
 
@@ -15,15 +15,18 @@ void Context::init() {
 		sdl_init = 1;
 	}
 
+	//GL context configuration
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
+	//Window size
 	window_width = 640;
 	window_height = 480;
 
+	//Window and context creation
 	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
 	context = SDL_GL_CreateContext(window);
 
@@ -45,22 +48,22 @@ void Context::init() {
 }
 
 int Context::poll() {
-	SDL_Event event;
-	while (SDL_PollEvent(&event)) {
-        switch (event.type) {
+	SDL_Event sdl_event;
+	while (SDL_PollEvent(&sdl_event)) {
+        switch (sdl_event.type) {
         	case SDL_QUIT:
         		return 0;
 			case SDL_KEYDOWN: {
-				Message message;
-				message.type = FE_INPUT;
-				message.input.source = this;
-				message.input.event = FE_KEY_DOWN;
-				message.input.value = event.key.keysym.sym;
+				Event key_event;
+				key_event.type = EVENT_INPUT_KEYDOWN;
+				key_event.input.keycode = sdl_event.key.keysym.sym;
+				dispatchEvent(key_event);
+				/*message.input.value = event.key.keysym.sym;
 				if (input_stack.size() > 0)
-					input_stack.back()->sendMessage(message);
+					input_stack.back()->sendMessage(message);*/
 				break;
 			}
-			case SDL_KEYUP: {
+			/*case SDL_KEYUP: {
 				Message message;
 				message.type = FE_INPUT;
 				message.input.source = this;
@@ -69,8 +72,9 @@ int Context::poll() {
 				if (input_stack.size() > 0)
 					input_stack.back()->sendMessage(message);
 				break;
-			}
+			}*/
 		}
+		continue;
     }
     return 1;
 }
@@ -81,8 +85,8 @@ void Context::swapBuffers() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Context::sendMessage(Message message) {
-	if (message.type == FE_INPUT) {
+void Context::handleEvent(Event& event) {
+	/*if (message.type == FE_INPUT) {
 		switch (message.input.event) {
 			case FE_START_LISTEN: {
 				if (message.common.source != NULL)
@@ -100,7 +104,7 @@ void Context::sendMessage(Message message) {
 			default:
 				break;
 		}
-	}
+	}*/
 }
 
 int Context::getWindowWidth() {

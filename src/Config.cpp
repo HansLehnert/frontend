@@ -8,7 +8,7 @@ Config::Config(std::string file) : filename(file) {
 	load();
 }
 
-int Config::load() {
+bool Config::load() {
 	std::ifstream config_file(filename);
 
 	if (config_file.is_open()) {
@@ -25,18 +25,18 @@ int Config::load() {
 			}
 		}
 		config_file.close();
-		return 0;
+		return true;
 	}
 	else {
-		return -1;
+		return false;
 	}
 }
 
-int Config::write() {
+bool Config::write() {
 	std::ofstream config_file(filename);
 
 	if (!config_file.is_open()) {
-		return -1;
+		return false;
 	}
 
 	auto pair = settings.begin();
@@ -49,23 +49,27 @@ int Config::write() {
 	}
 
 	config_file.close();
-	return 0;
+	return true;
 }
 
 void Config::setValue(std::string key, std::string value) {
 	settings[key] = value;
 }
 
-std::string Config::getValue(std::string key, int* result) {
+std::string Config::getValue(std::string key, bool* success) {
 	auto search = settings.find(key);
 	if (search != settings.end()) {
-		if (result != NULL)
-			*result = 0;
-		return search->second;;
+		if (success != NULL)
+			*success = true;
+		return search->second;
 	}
 	else {
-		if (result != NULL)
-			*result = -1;
-		return "";
+		if (success != NULL)
+			*success = false;
+		return std::string("");
 	}
+}
+
+std::string Config::operator[](std::string key) {
+	return getValue(key);
 }

@@ -3,11 +3,11 @@
 #include <vector>
 #include <SDL2/SDL.h>
 #include "core/Object.h"
-#include "Message.h"
+#include "core/Event.h"
 
 class Context : public Object {
 public:
-	virtual void sendMessage(Message);
+	virtual void handleEvent(Event&);
 
 	void init();
 	
@@ -26,5 +26,5 @@ private:
 	int window_width;
 	int window_height;
 
-	std::vector<Object*> input_stack;
+	//std::vector<Object*> input_stack;
 };

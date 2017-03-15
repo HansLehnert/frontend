@@ -7,7 +7,6 @@
 #include "core/Object.h"
 
 #include "Config.h"
-#include "Message.h"
 #include "objects/Image.h"
 #include "objects/Text.h"
 
@@ -16,7 +15,7 @@ public:
 	GameManager(std::string);
 	int launchGame(std::string);
 
-	virtual void sendMessage(Message);
+	virtual void handleEvent(Event&);
 
 	std::vector<std::string> getGameList();
 private:
