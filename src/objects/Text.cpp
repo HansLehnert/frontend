@@ -1,7 +1,6 @@
 #include "Text.h"
 
 #include <string>
-#include <GL/glew.h>
 #include "glm/glm.hpp"
 #include "core/Texture.h"
 #include "core/Program.h"
@@ -72,7 +71,7 @@ Text::Text(std::string new_content) : spacing(0) {
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-		glVertexAttribDivisor(1, 1);
+		//glVertexAttribDivisor(1, 1);
 
 		font.load("rsrc/font.png", GL_NEAREST);
 		program.load(text_vertex_shader, text_fragment_shader);
@@ -113,8 +112,8 @@ void Text::render() {
 	glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 	glBindBuffer(GL_ARRAY_BUFFER, string_buffer);
-	glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, 0, NULL);
-	glVertexAttribDivisor(1, 1);
+	//glVertexAttribIPointer(1, 1, GL_UNSIGNED_BYTE, 0, NULL);
+	//glVertexAttribDivisor(1, 1);
 
 
 	glUniform1f(program.uniformLocation("spacing"), spacing);
@@ -125,5 +124,5 @@ void Text::render() {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, font.getId());
 
-	glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, content.length());
+	//glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, content.length());
 }

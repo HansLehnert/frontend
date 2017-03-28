@@ -1,6 +1,6 @@
 CC		:= g++
-CFLAGS	:= -std=c++11 -Wall -DGLEW_STATIC
-LFLAGS	:= -lGL -lSDL2 -lGLEW -lSOIL -lcurl
+CFLAGS	:= -std=c++11 -Wall `sdl2-config --cflags --static-libs`
+LFLAGS	:= -lSDL2 -lSOIL -lcurl
 
 MKDIR	= mkdir
 RM		= rm
@@ -14,14 +14,30 @@ LIB_DIR := lib
 OUT_DIR := output
 
 PLATFORM := $(shell uname -s)
+RPI := $(shell grep -o BCM2709 /proc/cpuinfo)
 
 CPP_FILES	:= $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/**/*.cpp)
+
+ifeq ($(RPI), BCM2709)
+	CPP_FILES := $(filter-out src/Context.cpp, $(CPP_FILES))
+	CFLAGS += -DRASPBERRY_PI
+	LFLAGS += -lEGL -lGLESv2
+else
+	CPP_FILES := $(filter-out src/Context_Pi.cpp,$(CPP_FILES))
+	CFLAGS += -DGLEW_STATIC
+	LFLAGS += -lGLEW -lGL
+endif
+
 O_FILES		:= $(addprefix $(BIN_DIR)/, $(CPP_FILES:.cpp=.o))
 A_FILES		:= $(wildcard $(LIB_DIR)/*.a)
 
 .PHONY: all clean
 
 all: $(OUT_DIR)/$(BIN_NAME) $(O_FILES)
+	@$(MKDIR) -p $(OUT_DIR)/dat
+	@$(MKDIR) -p $(OUT_DIR)/emulator
+	@$(MKDIR) -p $(OUT_DIR)/game
+	@$(MKDIR) -p $(OUT_DIR)/logo
 
 $(BIN_DIR)/%.o: %.cpp
 	@$(MKDIR) -p $(dir $@)

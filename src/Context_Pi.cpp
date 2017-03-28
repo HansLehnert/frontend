@@ -11,10 +11,13 @@ int Context::sdl_init = 0;
 
 void Context::init() {
 	if (!sdl_init) {
-		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0)
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0) {
 			sdl_init = 1;
-		else
-			std::cout << "Failed to initialize SDL" << std::endl;
+			std::cout << "[Context]\tInitialized SDL" << std::endl;
+		}
+		else {
+			std::cout << "[Context]\tFailed to initialize SDL" << std::endl;
+		}
 	}
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
@@ -32,7 +35,7 @@ void Context::init() {
 
 	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
 	if ((context = SDL_GL_CreateContext(window)) == 0) {
-		std::cout << "Failed to create context";
+		std::cout << "Failed to create context" << std::endl;
 	}
 
 	//glewExperimental = GL_TRUE;
@@ -47,33 +50,26 @@ void Context::init() {
 
 	glClearColor(0, 0, 0, 0);
 
-	const unsigned char* gl_ver = glGetString(GL_SHADING_LANGUAGE_VERSION);
-	if (gl_ver != 0)
-		std::cout << "shader version: " << gl_ver << std::endl;
+	//Get GLSL shader version
+	//const unsigned char* gl_ver = glGetString(GL_SHADING_LANGUAGE_VERSION);
+	//if (gl_ver != 0)
+	//	std::cout << "shader version: " << gl_ver << std::endl;
 }
 
 int Context::poll() {
-	SDL_Event event;
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
+	SDL_Event sdl_event;
+	while (SDL_PollEvent(&sdl_event)) {
+		switch (sdl_event.type) {
 			case SDL_QUIT:
 				return 0;
 			case SDL_KEYDOWN: {
-				Message message;
-				message.type = FE_INPUT;
-				message.input.source = this;
-				message.input.event = FE_KEY_DOWN;
-				message.input.value = event.key.keysym.sym;
-				input_stack.back()->sendMessage(message);
+				Event key_event;
+				key_event.type = EVENT_INPUT_KEYDOWN;
+				key_event.input.keycode = sdl_event.key.keysym.sym;
+				dispatchEvent(key_event);
 				break;
 			}
 			case SDL_KEYUP: {
-				Message message;
-				message.type = FE_INPUT;
-				message.input.source = this;
-				message.input.event = FE_KEY_UP;
-				message.input.value = event.key.keysym.sym;
-				input_stack.back()->sendMessage(message);
 				break;
 			}
 		}
@@ -87,26 +83,8 @@ void Context::swapBuffers() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Context::sendMessage(Message message) {
-	if (message.type == FE_INPUT) {
-		switch (message.input.event) {
-			case FE_START_LISTEN: {
-				if (message.common.source != NULL)
-					input_stack.push_back(message.input.source);
-				break;
-			}
-			case FE_STOP_LISTEN: {
-				for (auto i = input_stack.begin(); i != input_stack.end(); i++) {
-					if (*i == message.common.source) {
-						input_stack.erase(i);
-					}
-				}
-				break;
-			}
-			default:
-				break;
-		}
-	}
+void Context::handleEvent(Event& event) {
+
 }
 
 int Context::getWindowWidth() {

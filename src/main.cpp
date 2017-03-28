@@ -31,11 +31,10 @@ int main() {
 	context.init();
 
 	//Create folders
-	createDir("game");
-	createDir("emulator");
-	createDir("logo");
-	createDir("dat");
-
+	//createDir("game");
+	//createDir("emulator");
+	//createDir("logo");
+	//createDir("dat");
 
 	Config main_config("settings");
 	main_config["rom_path"] = main_config["rom_path"];

@@ -1,7 +1,6 @@
 #include "Image.h"
 
 #include <string>
-#include <GL/glew.h>
 #include "glm/glm.hpp"
 #include "core/Texture.h"
 #include "core/Program.h"
