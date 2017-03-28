@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 
+#include <dirent.h>
 #include <unistd.h>
 
 #include "Context.h"
@@ -16,13 +17,23 @@
 
 //Creates directory
 //(Currently only works on UNIX system)
-bool createDir(std::string dir) {
-	std::string command = "mkdir " + dir;
+bool createDir(std::string dir_name) {
+	DIR* dir = opendir(dir_name.c_str());
 
-	if (system(command.c_str()) == 0)
-		return true;
-	else
+	if (dir == NULL) {
+		closedir(dir);
+
+		std::string command = "mkdir " + dir_name;
+
+		if (system(command.c_str()) == 0)
+			return true;
+		else
+			return false;
+	}
+	else {
+		closedir(dir);
 		return false;
+	}
 }
 
 
@@ -31,10 +42,14 @@ int main() {
 	context.init();
 
 	//Create folders
-	createDir("game");
-	createDir("emulator");
-	createDir("logo");
-	createDir("dat");
+	if (createDir("game"))
+		std::cout << "[System]\tCreated 'game' directory" << std::endl;
+	if (createDir("emulator"))
+		std::cout << "[System]\tCreated 'emulator' directory" << std::endl;
+	if (createDir("logo"))
+		std::cout << "[System]\tCreated 'logo' directory" << std::endl;
+	if (createDir("dat"))
+		std::cout << "[System]\tCreated 'dat' directory" << std::endl;
 
 
 	Config main_config("settings");

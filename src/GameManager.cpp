@@ -20,7 +20,8 @@ GameManager::GameManager(std::string rom_path) {
 	init(rom_path);
 	selection = game_list.begin();
 
-	addListener(EVENT_INPUT_KEYDOWN);
+	if (game_list.size() > 0)
+		addListener(EVENT_INPUT_KEYDOWN);
 
 	game_title.setScale(glm::vec2(0.05, 0.08));
 	game_title.setSpacing(0.2);
@@ -32,8 +33,8 @@ GameManager::GameManager(std::string rom_path) {
 }
 
 void GameManager::init(std::string rom_path) {
-	DIR *dir;
-	struct dirent *ent;
+	DIR* dir;
+	struct dirent* ent;
 
 	//Find ROMs in rom folder
 	dir = opendir(rom_path.c_str());
