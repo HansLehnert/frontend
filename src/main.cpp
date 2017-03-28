@@ -42,7 +42,6 @@ int main() {
 	context.init();
 
 	//Create folders
-<<<<<<< HEAD
 	if (createDir("game"))
 		std::cout << "[System]\tCreated 'game' directory" << std::endl;
 	if (createDir("emulator"))
@@ -52,12 +51,6 @@ int main() {
 	if (createDir("dat"))
 		std::cout << "[System]\tCreated 'dat' directory" << std::endl;
 
-=======
-	//createDir("game");
-	//createDir("emulator");
-	//createDir("logo");
-	//createDir("dat");
->>>>>>> 93ed981e3f462a2cd8d576b64e72c650451107f1
 
 	Config main_config("settings");
 	main_config["rom_path"] = main_config["rom_path"];
