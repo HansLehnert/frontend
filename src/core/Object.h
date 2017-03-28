@@ -53,5 +53,6 @@ private:
 	static std::list<Object*> object_list;
 	std::list<Object*>::iterator list_pos; //Stores position in list
 
+	typedef std::pair<Object*, int> Listener;
 	static std::vector<std::list<Object*> > listener;
 };

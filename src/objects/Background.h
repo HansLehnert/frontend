@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "GL/glew.h"
+#include "gl_inc.h"
 #include "glm/glm.hpp"
 #include "core/Program.h"
 #include "core/Object.h"

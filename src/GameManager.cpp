@@ -29,7 +29,9 @@ GameManager::GameManager(std::string rom_path) {
 	Scrapper scrapper;
 	scrapper.scrap(&game_list, &emulator_list);
 
-	updateUI();
+	//updateUI();
+	game_logo.visible = 0;
+	game_title.visible = 0;
 }
 
 void GameManager::init(std::string rom_path) {
@@ -56,7 +58,7 @@ void GameManager::init(std::string rom_path) {
 
 				game_config.getValue("emulator", &has_value);
 				if (!has_value)
-					game_config.setValue("emulator", "mame");
+					game_config.setValue("emulator", "fba");
 
 				game_config.getValue("launch_options", &has_value);
 				if (!has_value)
@@ -70,7 +72,8 @@ void GameManager::init(std::string rom_path) {
 		closedir(dir);
 	}
 	else {
-		std::cout << "[GameManager]\tInvalid rom path" << std::endl;
+		std::cout << "[GameManager]\tInvalid rom path ("
+		          << rom_path << ")" << std::endl;
 	}
 
 	//Read emulator configuration

@@ -16,7 +16,7 @@ uniform vec3 offset;
 
 void main() {
 	gl_Position = world_matrix * (vertex_position + vec4(offset, 1));
-	gl_Position.w = 1.0 + gl_Position.z;	
+	gl_Position.w = 1.0 + gl_Position.z;
 	position = gl_Position.xyz;
 }
 

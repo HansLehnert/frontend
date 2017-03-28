@@ -29,5 +29,7 @@
 *.app
 
 # Directories
+build/
 output/
 bin/
+.vs/

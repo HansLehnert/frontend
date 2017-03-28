@@ -1,7 +1,6 @@
 #include <core/Program.h>
 
 #include <iostream>
-#include <GL/glew.h>
 
 void Program::load(const char* vertex, const char* fragment) {
 	GLuint vertex_shader, fragment_shader;

@@ -46,7 +46,7 @@ void Object::renderAll() {
 std::vector<std::list<Object*> > Object::listener(EVENT_NULL);
 
 void Object::addListener(EventType type) {
-	listener[type].push_back(this);
+	listener[type].push_front(this);
 }
 
 
