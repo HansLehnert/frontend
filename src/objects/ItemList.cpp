@@ -6,7 +6,7 @@
 
 #include "glm/glm.hpp"
 
-ItemList::ItemList(std::vector<std::string> list) : items(list) {
+ItemList::ItemList(std::vector<std::string> list, std::string instance_name) : Object(instance_name), items(list) {
 	selection = items.begin();
 
 	item_text.setContent(*selection);

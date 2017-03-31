@@ -53,12 +53,13 @@ int main() {
 
 
 	Config main_config("settings");
-	main_config["rom_path"] = main_config["rom_path"];
+	main_config.setValue("rom_path", main_config["rom_path"]);
+	main_config.setValue("emulator_path", main_config["emulator_path"]);
 	main_config.write();
 
-	GameManager game_manager(main_config["rom_path"]);
+	GameManager game_manager(&main_config);
 
-	Background background(6);
+	Background background(6, "background_1");
 
 	Object::world_matrix[0][0] = 0;
 	Object::world_matrix[0][1] = context.getAspectRatio();

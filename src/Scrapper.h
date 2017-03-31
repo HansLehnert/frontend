@@ -9,7 +9,7 @@
 
 class Scrapper {
 public:
-	void scrap(std::map<std::string, Config>*, const std::map<std::string, Config>*);
+	void scrap(std::map<std::string, Config>*, std::map<std::string, Config>*);
 private:
 	int getFile(std::string, std::string*, CURL*);
 	int saveFile(std::string, std::string, CURL*);

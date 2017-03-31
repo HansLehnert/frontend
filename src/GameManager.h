@@ -12,7 +12,7 @@
 
 class GameManager : public Object {
 public:
-	GameManager(std::string);
+	GameManager(Config*, std::string = "");
 	int launchGame(std::string);
 
 	virtual void handleEvent(Event&);
@@ -21,6 +21,8 @@ public:
 private:
 	void init(std::string);
 	void updateUI();
+
+	Config* config;
 
 	std::map<std::string, Config> game_list;
 	std::map<std::string, Config> emulator_list;

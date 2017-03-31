@@ -1,7 +1,9 @@
 #pragma once
 
+#include <string>
 #include <vector>
 #include <list>
+#include <unordered_map>
 
 #include <SDL2/SDL.h>
 #include "glm/glm.hpp"
@@ -10,7 +12,7 @@
 
 class Object {
 public:
-	Object();
+	Object(std::string);
 	~Object();
 
 	virtual void update() {};
@@ -24,12 +26,11 @@ public:
 	void dispatchEvent(Event&);
 	virtual void handleEvent(Event&) {};
 
-	static glm::mat4 world_matrix;
-
 	///////////////////////////////////////////////////////////////////////////
 	//Graphic members
 	///////////////////////////////////////////////////////////////////////////
 	bool visible;
+	static glm::mat4 world_matrix;
 
 	void setPosition(glm::vec3);
 	glm::vec3 getPosition();
@@ -38,7 +39,6 @@ public:
 	glm::vec3 getScale();
 
 protected:
-
 	///////////////////////////////////////////////////////////////////////////
 	//Graphic members
 	///////////////////////////////////////////////////////////////////////////
@@ -50,8 +50,9 @@ protected:
 	void computeModelMatrix();
 
 private:
-	static std::list<Object*> object_list;
-	std::list<Object*>::iterator list_pos; //Stores position in list
+	std::string name;
+	static std::unordered_multimap<std::string, Object*> object_list;
+	std::unordered_multimap<std::string, Object*>::iterator list_pos; //Stores position in list
 
 	typedef std::pair<Object*, int> Listener;
 	static std::vector<std::list<Object*> > listener;

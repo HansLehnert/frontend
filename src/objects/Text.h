@@ -9,7 +9,7 @@
 
 class Text: public Object {
 public:
-	Text(std::string = "");
+	Text(std::string = "", std::string = "");
 	
 	virtual void render();
 

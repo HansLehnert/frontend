@@ -38,7 +38,7 @@ void main() {
 
 )glsl";
 
-Background::Background(int div) : grid_div(div){
+Background::Background(int div, std::string instance_name) : Object(instance_name), grid_div(div){
 	model.push_back(glm::vec4(-2, -2, 1, 1));
 	model.push_back(glm::vec4(-2, 2, 1, 1));
 	model.push_back(glm::vec4(2, 2, 1, 1));

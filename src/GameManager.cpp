@@ -16,8 +16,11 @@
 
 const char* rom_ext = ".zip";
 
-GameManager::GameManager(std::string rom_path) {
-	init(rom_path);
+GameManager::GameManager(Config* main_config, std::string instance_name) :
+	Object(instance_name),
+	config(main_config){
+
+	init((*config)["rom_path"]);
 	selection = game_list.begin();
 
 	if (game_list.size() > 0)
@@ -29,9 +32,7 @@ GameManager::GameManager(std::string rom_path) {
 	Scrapper scrapper;
 	scrapper.scrap(&game_list, &emulator_list);
 
-	//updateUI();
-	game_logo.visible = 0;
-	game_title.visible = 0;
+	updateUI();
 }
 
 void GameManager::init(std::string rom_path) {
@@ -58,7 +59,7 @@ void GameManager::init(std::string rom_path) {
 
 				game_config.getValue("emulator", &has_value);
 				if (!has_value)
-					game_config.setValue("emulator", "fba");
+					game_config.setValue("emulator", "");
 
 				game_config.getValue("launch_options", &has_value);
 				if (!has_value)
@@ -105,12 +106,13 @@ int GameManager::launchGame(std::string game) {
 	}
 
 	std::string cmd = "";
-	cmd += emulator->second.getValue("path");
+	cmd += (*config)["emulator_path"];
+	cmd += " -L " + emulator->second.getValue("path");
 	cmd += " " + emulator->second.getValue("options");
 	cmd += " " + game_config->second.getValue("options");
 	cmd += " " + game;
 
-	std::cout << cmd << std::endl;
+	std::cout << "[GameManager]\tLaunching " << game << std::endl;
 	system(cmd.c_str());
 
 	return 0;
@@ -144,21 +146,25 @@ void GameManager::updateUI() {
 
 void GameManager::handleEvent(Event& event) {
 	if (event.type == EVENT_INPUT_KEYDOWN) {
-		switch (event.input.keycode) {
-			case SDLK_DOWN:
+		switch (event.input.key) {
+			case KEY_DOWN:
 				if (selection != (--game_list.end()))
 					selection++;
 				updateUI();
 				break;
-			case SDLK_UP:
+
+			case KEY_UP:
 				if (selection != game_list.begin())
 					selection--;
 				updateUI();
 				break;
-			case SDLK_RETURN: {
+
+			case KEY_SELECT:
 				launchGame(selection->first);
 				break;
-			}
+
+			default:
+				break;
 		}
 	}
 }

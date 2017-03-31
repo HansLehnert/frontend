@@ -9,6 +9,10 @@
 
 int Context::sdl_init = 0;
 
+Context::Context(std::string instance_name) : Object(instance_name) {
+	
+}
+
 void Context::init() {
 	if (!sdl_init) {
 		SDL_InitSubSystem(SDL_INIT_VIDEO);
@@ -53,10 +57,32 @@ int Context::poll() {
         switch (sdl_event.type) {
         	case SDL_QUIT:
         		return 0;
+
+        	//Handle keyboard input
 			case SDL_KEYDOWN: {
 				Event key_event;
 				key_event.type = EVENT_INPUT_KEYDOWN;
-				key_event.input.keycode = sdl_event.key.keysym.sym;
+
+				switch (sdl_event.key.keysym.sym) {
+					case SDLK_UP:
+						key_event.input.key = KEY_UP;
+						break;
+					case SDLK_DOWN:
+						key_event.input.key = KEY_DOWN;
+						break;
+					case SDLK_LEFT:
+						key_event.input.key = KEY_LEFT;
+						break;
+					case SDLK_RIGHT:
+						key_event.input.key = KEY_RIGHT;
+						break;
+					case SDLK_RETURN:
+						key_event.input.key = KEY_SELECT;
+						break;
+					default:
+						return 1;
+				}
+
 				dispatchEvent(key_event);
 				/*message.input.value = event.key.keysym.sym;
 				if (input_stack.size() > 0)

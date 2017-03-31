@@ -12,6 +12,19 @@ enum EventType {
 	EVENT_NULL
 };
 
+//Input event enums
+
+enum Key {
+	KEY_UP,
+	KEY_LEFT,
+	KEY_RIGHT,
+	KEY_DOWN,
+	KEY_SELECT
+};
+
+
+//Event structure
+
 class Object; //Forward declaration to use pointer
 
 struct Event {
@@ -21,8 +34,7 @@ struct Event {
 	union {
 		//Input Events
 		struct {
-			int keycode;
-			int keychar;
+			Key key;
 		} input;
 	};
 };

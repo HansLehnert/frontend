@@ -8,7 +8,7 @@
 
 class ItemList : public Object {
 public:
-	ItemList(std::vector<std::string>);
+	ItemList(std::vector<std::string>, std::string = "");
 
 	//virtual void sendMessage(Message);
 private:

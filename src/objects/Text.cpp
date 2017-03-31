@@ -55,7 +55,7 @@ GLuint Text::model_buffer = 0;
 Program Text::program;
 Texture Text::font;
 
-Text::Text(std::string new_content) : spacing(0) {
+Text::Text(std::string new_content, std::string instance_name) : Object(instance_name), spacing(0) {
 	glGenBuffers(1, &string_buffer);
 	setContent(new_content);
 	model_matrix = glm::mat4(1);

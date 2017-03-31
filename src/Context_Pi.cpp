@@ -9,6 +9,10 @@
 
 int Context::sdl_init = 0;
 
+Context::Context(std::string instance_name) : Object(instance_name) {
+	
+}
+
 void Context::init() {
 	if (!sdl_init) {
 		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0) {

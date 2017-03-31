@@ -7,6 +7,8 @@
 
 class Context : public Object {
 public:
+	Context(std::string = "");
+
 	virtual void handleEvent(Event&);
 
 	void init();

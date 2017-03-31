@@ -22,7 +22,7 @@ size_t write_callback(char* data, size_t size, size_t nmemb, void* dest) {
 }
 
 
-void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<std::string, Config>* emulator_list) {
+void Scrapper::scrap(std::map<std::string, Config>* game_list, std::map<std::string, Config>* emulator_list) {
 	//std::map<std::string, char*> dat_src;
 	std::map<std::string, pugi::xml_document> dat_xml;
 
@@ -33,7 +33,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
 
 	std::cout << "[Scrapper]\tLoading .dat files" << std::endl;
-	for (auto i : *emulator_list) {
+	for (auto& i : *emulator_list) {
 		bool dat_exists;
 		std::string dat_path = i.second.getValue("dat_file", &dat_exists);
 
@@ -70,9 +70,11 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 	}
 	
 	for (auto &i : *game_list) {
-		std::string game_name = i.second.getValue("game_name");
-		std::string game_logo = i.second.getValue("game_logo");
-		std::string game_art = i.second.getValue("game_art");
+		Config* game = &(i.second);
+
+		std::string game_name = (*game)["game_name"];
+		std::string game_logo = (*game)["game_logo"];
+		std::string game_art = (*game)["game_art"];
 
 		std::cout << "[Scrapper]\tLooking up " << i.first << std::endl;
 
@@ -80,17 +82,29 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 		if (game_name == "") {
 			std::cout << "\t\tMissing name" << std::endl;
 
-			std::string emulator = i.second.getValue("emulator");
-			if (dat_xml.find(emulator) == dat_xml.end())
-				continue;
+			std::string emulator = (*game)["emulator"];
+			if (emulator == "")
+				std::cout << "\t\tMissing emulator" << std::endl;;
 
+			//Check all dat files
+			for (auto& dat : dat_xml) {
+				//If game has emulator only check that dat file
+				if (emulator != "" && emulator != dat.first)
+					continue;
 
-			for (pugi::xml_node node : dat_xml[emulator].child("datafile").children("game")) {
-				if (node.attribute("name").value() == i.first) {
-					game_name = node.child("description").child_value();
-					i.second.setValue("game_name", game_name);
-					std::cout << "\t\tNew name: " << game_name << std::endl;
-					break;
+				for (pugi::xml_node& node : dat.second.child("datafile").children("game")) {
+					if (node.attribute("name").value() == i.first) {
+						game_name = node.child("description").child_value();
+						game->setValue("game_name", game_name);
+						std::cout << "\t\tNew name: " << game_name << std::endl;
+
+						if (emulator == "") {
+							emulator = dat.first;
+							game->setValue("emulator", emulator);
+							std::cout << "\t\tNew emulator: " << emulator << std::endl;
+						}
+						break;
+					}
 				}
 			}
 		}
@@ -128,7 +142,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 
 			//Search logo
 			bool found = false;
-			for (pugi::xml_node node : info_xml.child("Data").children("Game")) {
+			for (pugi::xml_node& node : info_xml.child("Data").children("Game")) {
 				std::string entry_name = cleanName(node.child("GameTitle").child_value());
 				int platform_id = node.child("PlatformId").text().as_int();
 
@@ -145,7 +159,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 				}
 
 				//check alt names
-				for (pugi::xml_node alt_name : node.child("AlternateTitles").children("title")) {
+				for (pugi::xml_node& alt_name : node.child("AlternateTitles").children("title")) {
 					entry_name = cleanName(alt_name.child_value());
 
 					std::cout << "\t\t" << entry_name << std::endl;
@@ -166,7 +180,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 			if (found) {
 				std::string logo_filename = "logo/" + i.first + ".png";
 				if (saveFile(base_img_url + logo_url, logo_filename, curl_handle)) {
-					i.second.setValue("game_logo", logo_filename);
+					game->setValue("game_logo", logo_filename);
 					std::cout << "\t\tLogo found" << std::endl;
 				}
 				else {
@@ -178,7 +192,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, const std::map<st
 			}
 		}
 
-		i.second.write();
+		game->write();
 	}
 
 	curl_global_cleanup();

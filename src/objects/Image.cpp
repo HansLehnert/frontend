@@ -50,7 +50,7 @@ const glm::vec4 model[] = {
 GLuint Image::model_buffer = 0;
 Program Image::program;
 
-Image::Image(std::string image_file) {
+Image::Image(std::string image_file, std::string instance_name) : Object(instance_name) {
 	if (image_file.length() > 0)
 		setContent(image_file);
 

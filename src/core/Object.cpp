@@ -5,12 +5,12 @@
 #include <list>
 #include "glm/glm.hpp"
 
-std::list<Object*> Object::object_list;
+std::unordered_multimap<std::string, Object*> Object::object_list;
 glm::mat4 Object::world_matrix(1);
 
-Object::Object() : model_matrix(1) {
-	object_list.push_front(this);
-	list_pos = object_list.begin();
+Object::Object(std::string instance_name) : model_matrix(1) {
+	name = instance_name;
+	list_pos = object_list.insert(std::pair<std::string, Object*>(name, this));
 }
 
 
@@ -20,15 +20,15 @@ Object::~Object() {
 
 
 void Object::updateAll() {
-	for (std::list<Object*>::iterator i = object_list.begin(); i != object_list.end(); i++) {
-		(*i)->update();
+	for (auto& object : object_list) {
+		object.second->update();
 	}
 }
 
 
 void Object::renderAll() {
-	for (std::list<Object*>::iterator i = object_list.begin(); i != object_list.end(); i++) {
-		(*i)->render();
+	for (auto& object : object_list) {
+		object.second->render();
 	}
 }
 

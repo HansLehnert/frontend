@@ -9,7 +9,7 @@
 
 class Background : public Object {
 public:
-	Background(int);
+	Background(int, std::string = "");
 
 	virtual void render();
 	virtual void update();

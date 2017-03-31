@@ -9,7 +9,7 @@
 
 class Image: public Object {
 public:
-	Image(std::string = "");
+	Image(std::string = "", std::string = "");
 	
 	virtual void render();
 
