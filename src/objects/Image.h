@@ -15,14 +15,14 @@ public:
 
 	int setContent(std::string);
 	void setSize(glm::vec2);
+
+protected:
+	Texture texture;
+
 private:
 	std::string content;
 	float shape;
 
 	static GLuint model_buffer;
 	static Program program;
-	
-	Texture texture;
-
-	GLuint string_buffer = 0;
 };

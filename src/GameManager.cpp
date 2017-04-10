@@ -26,9 +26,6 @@ GameManager::GameManager(Config* main_config, std::string instance_name) :
 	if (game_list.size() > 0)
 		addListener(EVENT_INPUT_KEYDOWN);
 
-	game_title.setScale(glm::vec2(0.05, 0.08));
-	game_title.setSpacing(0.2);
-
 	Scrapper scrapper;
 	scrapper.scrap(&game_list, &emulator_list);
 
@@ -136,10 +133,12 @@ void GameManager::updateUI() {
 	else {
 		game_logo.visible = 0;
 
-		std::string game_name = selection->second.getValue("game_name");
+
+		std::string game_name = selection->second["game_name"];
+		if (game_name == "")
+			game_name = selection->first;
 		game_name = game_name.substr(0, game_name.find("("));
-		game_title.setContent(game_name);
-		game_title.setPosition(glm::vec2(game_name.length() * -0.03, 0));
+		game_title.setText(game_name);
 		game_title.visible = 1;
 	}
 }

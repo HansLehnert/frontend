@@ -5,6 +5,11 @@
 #include "core/Texture.h"
 #include "core/Program.h"
 
+///////////////////////////////////////////////////////////
+//Shaders
+///////////////////////////////////////////////////////////
+//Move to external file
+
 const char* image_vertex_shader = R"glsl(
 #version 330
 
@@ -26,6 +31,7 @@ void main() {
 
 )glsl";
 
+
 const char* image_fragment_shader = R"glsl(
 #version 330
 
@@ -40,6 +46,10 @@ void main() {
 
 )glsl";
 
+//////////////////////////////////////////////////////////
+//Model
+//////////////////////////////////////////////////////////
+
 const glm::vec4 model[] = {
 	glm::vec4(-1, -1, -1, 1),
 	glm::vec4(-1, 1, -1, 1),
@@ -47,8 +57,17 @@ const glm::vec4 model[] = {
 	glm::vec4(1, -1, -1, 1)
 };
 
+
+//////////////////////////////////////////////////////////
+//Static Variables
+//////////////////////////////////////////////////////////
+
 GLuint Image::model_buffer = 0;
 Program Image::program;
+
+//////////////////////////////////////////////////////////
+//Member functions
+//////////////////////////////////////////////////////////
 
 Image::Image(std::string image_file, std::string instance_name) : Object(instance_name) {
 	if (image_file.length() > 0)
@@ -69,6 +88,7 @@ Image::Image(std::string image_file, std::string instance_name) : Object(instanc
 	}
 };
 
+
 void Image::setSize(glm::vec2 size) {
 	if (size.x / size.y > shape)
 		setScale(glm::vec3(size.y * shape, size.y, 1));
@@ -76,8 +96,9 @@ void Image::setSize(glm::vec2 size) {
 		setScale(glm::vec3(size.x, size.x / shape, 1));
 }
 
+
 int Image::setContent(std::string image_file) {
-	if (texture.load(image_file.c_str())) {
+	if (texture.loadFile(image_file)) {
 		shape = texture.getWidth() / (float)texture.getHeight();
 		setSize(glm::vec2(0.5));
 		return 1;
@@ -86,6 +107,7 @@ int Image::setContent(std::string image_file) {
 		return 0;
 	}
 }
+
 
 void Image::render() {
 	if (!visible)

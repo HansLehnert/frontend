@@ -14,17 +14,35 @@ Context::Context(std::string instance_name) : Object(instance_name) {
 }
 
 void Context::init() {
+	//SDL initialization
 	if (!sdl_init) {
-		SDL_InitSubSystem(SDL_INIT_VIDEO);
-		sdl_init = 1;
+		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0) {
+			sdl_init = 1;
+			std::cout << "[Context]\tInitialized SDL" << std::endl;
+		}
+		else {
+			std::cout << "[Context]\tFailed to initialize SDL" << std::endl;
+		}
 	}
 
 	//GL context configuration
+
+#ifdef RASPBERRY_PI
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 4);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 4);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 4);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 4);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+#else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
+#endif
 
 	//Window size
 	window_width = 640;
@@ -32,12 +50,18 @@ void Context::init() {
 
 	//Window and context creation
 	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
-	context = SDL_GL_CreateContext(window);
+	if ((context = SDL_GL_CreateContext(window)) == 0) {
+		std::cout << "[Context]\tFailed to create context" << std::endl;
+	}
 
+
+#ifndef RASPBERRY_PI
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
-		std::cout << "GLEW init failed." << std::endl;
+		std::cout << "[Context]\tGLEW init failed." << std::endl;
+#endif
 
+	//GL configuration
 	glClearColor(0, 0, 0, 0);
 
 	glEnable(GL_DEPTH_TEST);
@@ -46,9 +70,11 @@ void Context::init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+#ifndef RASPBERRY_PI
 	GLuint null_vao;
 	glGenVertexArrays(1, &null_vao);
 	glBindVertexArray(null_vao);
+#endif
 }
 
 int Context::poll() {
