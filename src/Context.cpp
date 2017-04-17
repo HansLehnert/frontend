@@ -1,17 +1,22 @@
 #include "Context.h"
 
+#include <iostream>
+
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_opengl.h>
-#include <iostream>
+#include <SDL2/SDL_image.h>
 
 #include "core/Event.h"
 
+
 int Context::sdl_init = 0;
+
 
 Context::Context(std::string instance_name) : Object(instance_name) {
 	
 }
+
 
 void Context::init() {
 	//SDL initialization
@@ -22,6 +27,11 @@ void Context::init() {
 		}
 		else {
 			std::cout << "[Context]\tFailed to initialize SDL" << std::endl;
+		}
+
+
+		if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG)) {
+			std::cout << "[Context]\tFailed to initialize image libraries" << std::endl;
 		}
 	}
 
@@ -131,11 +141,13 @@ int Context::poll() {
     return 1;
 }
 
+
 void Context::swapBuffers() {
 	SDL_GL_SwapWindow(window);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+
 
 void Context::handleEvent(Event& event) {
 	/*if (message.type == FE_INPUT) {
@@ -159,13 +171,16 @@ void Context::handleEvent(Event& event) {
 	}*/
 }
 
+
 int Context::getWindowWidth() {
 	return window_width;
 }
 
+
 int Context::getWindowHeight() {
 	return window_height;
 }
+
 
 float Context::getAspectRatio() {
 	return window_width / (float) window_height;

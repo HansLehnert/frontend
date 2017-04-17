@@ -10,7 +10,6 @@
 #include "GameManager.h"
 #include "core/Object.h"
 #include "objects/Text.h"
-#include "objects/ItemList.h"
 #include "objects/Background.h"
 #include "objects/Image.h"
 

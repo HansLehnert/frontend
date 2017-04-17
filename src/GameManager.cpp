@@ -18,19 +18,24 @@ const char* rom_ext = ".zip";
 
 GameManager::GameManager(Config* main_config, std::string instance_name) :
 	Object(instance_name),
-	config(main_config){
+	config(main_config) {
 
 	init((*config)["rom_path"]);
 	selection = game_list.begin();
 
-	if (game_list.size() > 0)
-		addListener(EVENT_INPUT_KEYDOWN);
-
 	Scrapper scrapper;
 	scrapper.scrap(&game_list, &emulator_list);
 
-	updateUI();
+	if (game_list.size() > 0) {
+		addListener(EVENT_INPUT_KEYDOWN);
+		updateUI();
+	}
+	else {
+		game_title.visible = false;
+		game_logo.visible = false;
+	}
 }
+
 
 void GameManager::init(std::string rom_path) {
 	DIR* dir;
@@ -91,6 +96,7 @@ void GameManager::init(std::string rom_path) {
 	}
 }
 
+
 int GameManager::launchGame(std::string game) {
 	auto game_config = game_list.find(game);
 	if (game_config == game_list.end()) {
@@ -115,6 +121,7 @@ int GameManager::launchGame(std::string game) {
 	return 0;
 }
 
+
 std::vector<std::string> GameManager::getGameList() {
 	std::vector<std::string> result;
 	for (auto game : game_list) {
@@ -122,6 +129,7 @@ std::vector<std::string> GameManager::getGameList() {
 	}
 	return result;
 }
+
 
 void GameManager::updateUI() {
 	if (game_logo.setContent(selection->second.getValue("game_logo"))) {
@@ -142,6 +150,7 @@ void GameManager::updateUI() {
 		game_title.visible = 1;
 	}
 }
+
 
 void GameManager::handleEvent(Event& event) {
 	if (event.type == EVENT_INPUT_KEYDOWN) {

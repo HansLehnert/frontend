@@ -9,6 +9,7 @@ std::unordered_multimap<std::string, Object*> Object::object_list;
 glm::mat4 Object::world_matrix(1);
 
 Object::Object(std::string instance_name) : model_matrix(1) {
+	visible = true;
 	name = instance_name;
 	list_pos = object_list.insert(std::pair<std::string, Object*>(name, this));
 }
@@ -28,7 +29,8 @@ void Object::updateAll() {
 
 void Object::renderAll() {
 	for (auto& object : object_list) {
-		object.second->render();
+		if (object.second->visible)
+			object.second->render();
 	}
 }
 

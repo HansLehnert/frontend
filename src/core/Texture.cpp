@@ -3,7 +3,9 @@
 #include <iostream>
 #include <cstring>
 
-#include <SOIL/SOIL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_surface.h>
+//#include <SOIL/SOIL.h>
 
 Texture::Texture() : loaded(false) {
 	glGenTextures(1, &id);
@@ -14,13 +16,34 @@ Texture::Texture() : loaded(false) {
 
 Texture::~Texture() {
 	glDeleteTextures(1, &id);
-	SOIL_free_image_data(image_buffer);
+
+	/*if (loaded)
+		delete image_buffer;*/
+	//SOIL_free_image_data(image_buffer);
 	return;
 }
 
 
 int Texture::loadFile(std::string filename, GLuint filter) {
-	image_buffer = SOIL_load_image(filename.c_str(), &width, &height, NULL, SOIL_LOAD_RGBA);
+	SDL_Surface* surface = IMG_Load(filename.c_str());
+
+	if (surface != nullptr) {
+		//convert to RGBA
+		SDL_Surface* surface_rgba;
+		surface_rgba = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA8888, 0);
+
+		loadData((unsigned char*)surface_rgba->pixels, surface->w, surface->h, 4, filter);
+
+		SDL_FreeSurface(surface_rgba);		
+		SDL_FreeSurface(surface);
+		return 1;
+	}
+	else {
+		std::cout << "[Texture]\tFailed to load " << filename << std::endl;
+		return 0;
+	}
+
+	/*image_buffer = SOIL_load_image(filename.c_str(), &width, &height, NULL, SOIL_LOAD_RGBA);
 
 	if (image_buffer) {
 		glBindTexture(GL_TEXTURE_2D, id);
@@ -32,11 +55,16 @@ int Texture::loadFile(std::string filename, GLuint filter) {
 	else {
 		std::cout << "[Texture]\tFailed to load " << filename << std::endl;
 		return 0;
-	}
+	}*/
+
+
 }
 
 
 void Texture::loadData(const unsigned char* data, int w, int h, int c, GLuint filter) {
+	if (loaded)
+		delete image_buffer;
+
 	image_buffer = new unsigned char[w * h * c];
 	memcpy(image_buffer, data, w * h * c);
 
