@@ -7,6 +7,12 @@
 #include <SDL2/SDL_surface.h>
 //#include <SOIL/SOIL.h>
 
+#ifdef RASPBERRY_PI
+#define PIXEL_FORMAT SDL_PIXELFORMAT_ABGR8888
+#else
+#define PIXEL_FORMAT SDL_PIXELFORMAT_BGRA8888
+#endif
+
 Texture::Texture() : loaded(false) {
 	glGenTextures(1, &id);
 
@@ -30,7 +36,7 @@ int Texture::loadFile(std::string filename, GLuint filter) {
 	if (surface != nullptr) {
 		//convert to RGBA
 		SDL_Surface* surface_rgba;
-		surface_rgba = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA8888, 0);
+		surface_rgba = SDL_ConvertSurfaceFormat(surface, PIXEL_FORMAT, 0);
 
 		loadData((unsigned char*)surface_rgba->pixels, surface->w, surface->h, 4, filter);
 

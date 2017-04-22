@@ -11,11 +11,11 @@
 //Move to external file
 
 const char* image_vertex_shader = R"glsl(
-#version 330
+#version 100
 
-layout(location = 0) in vec4 position;
+attribute vec4 position;
 
-out vec2 vertex_uv;
+varying vec2 vertex_uv;
 
 uniform mat4 world_matrix;
 uniform mat4 model_matrix;
@@ -23,25 +23,25 @@ uniform mat4 model_matrix;
 void main() {
 	gl_Position = position;
 	gl_Position = world_matrix * model_matrix * gl_Position;
-	gl_Position.z = -1;
 
-	vertex_uv.x = position.x <= 0 ? 0 : 1;
-	vertex_uv.y = position.y <= 0 ? 1 : 0;
+	vertex_uv.x = position.x <= 0.0 ? 0.0 : 1.0;
+	vertex_uv.y = position.y <= 0.0 ? 1.0 : 0.0;
 }
 
 )glsl";
 
 
 const char* image_fragment_shader = R"glsl(
-#version 330
+#version 100
 
-in vec2 vertex_uv;
-out vec4 out_color;
+varying vec2 vertex_uv;
+//out vec4 out_color;
 
 uniform sampler2D image;
 
 void main() {
-	out_color = texture(image, vertex_uv);
+	gl_FragColor = texture2D(image, vertex_uv);
+	//gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
 )glsl";
@@ -78,13 +78,13 @@ Image::Image(std::string image_file, std::string instance_name) : Object(instanc
 		glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(model), model, GL_STATIC_DRAW);
 		
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+		//glEnableVertexAttribArray(0);
+		//glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
 		program.load(image_vertex_shader, image_fragment_shader);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture.getId());
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, texture.getId());
 	}
 };
 
@@ -110,9 +110,6 @@ int Image::setContent(std::string image_file) {
 
 
 void Image::render() {
-	if (!visible)
-		return;
-
 	glUseProgram(program.getId());
 
 	glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
