@@ -19,11 +19,11 @@ RPI := $(shell grep -o BCM2709 /proc/cpuinfo)
 CPP_FILES	:= $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/**/*.cpp)
 
 ifeq ($(RPI), BCM2709)
-	CPP_FILES := $(filter-out src/Context.cpp, $(CPP_FILES))
+	#CPP_FILES := $(filter-out src/Context.cpp, $(CPP_FILES))
 	CFLAGS += -DRASPBERRY_PI
 	LFLAGS += -lEGL -lGLESv2
 else
-	CPP_FILES := $(filter-out src/Context_Pi.cpp,$(CPP_FILES))
+	#CPP_FILES := $(filter-out src/Context_Pi.cpp,$(CPP_FILES))
 	CFLAGS += -DGLEW_STATIC
 	LFLAGS += -lGLEW -lGL
 endif

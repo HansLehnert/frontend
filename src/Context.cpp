@@ -2,9 +2,15 @@
 
 #include <iostream>
 
-#include <GL/glew.h>
-#include <SDL2/SDL.h>
+#include "gl_inc.h"
+
+#ifdef RASPBERRY_PI
+#include <SDL2/SDL_opengles.h>
+#else
 #include <SDL2/SDL_opengl.h>
+#endif
+
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #include "core/Event.h"
