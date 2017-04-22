@@ -67,7 +67,9 @@ void GameManager::init(std::string rom_path) {
 				if (!has_value)
 					game_config.setValue("launch_options", "");
 
-				game_config.write();
+				game_config.getValue("path", &has_value);
+				if (!has_value)
+					game_config.setValue("path", rom_path + "/" + file_name);
 
 				game_list.insert(std::pair<std::string, Config>(game_name, game_config));
 			}
@@ -113,7 +115,7 @@ int GameManager::launchGame(std::string game) {
 	cmd += " -L " + emulator->second.getValue("path");
 	cmd += " " + emulator->second.getValue("options");
 	cmd += " " + game_config->second.getValue("options");
-	cmd += " " + game;
+	cmd += " " + game_config->second.getValue("path");
 
 	std::cout << "[GameManager]\tLaunching " << game << std::endl;
 	system(cmd.c_str());
