@@ -78,7 +78,7 @@ void Context::init() {
 #endif
 
 	//GL configuration
-	glClearColor(0, 0, 0, 0);
+	glClearColor(1, 0, 0, 0);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -150,14 +150,16 @@ int Context::poll() {
 
 void Context::pause() {
 #ifdef RASPBERRY_PI
-	SDL_GL_DeleteContext(context);
+	//SDL_GL_DeleteContext(context);
+	SDL_DestroyWindow(window);
 #endif
 }
 
 
 void Context::resume() {
 #ifdef RASPBERRY_PI
-	context = SDL_GL_CreateContext(window);
+	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
+
 	SDL_GL_MakeCurrent(window, context);
 #endif
 }
