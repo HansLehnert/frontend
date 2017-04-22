@@ -114,11 +114,15 @@ int GameManager::launchGame(std::string game) {
 	std::string cmd = "";
 	cmd += (*config)["emulator_path"];
 	cmd += " -L " + emulator->second.getValue("path");
+	cmd += " --appendconfig \"" + (*config)["base_config"] + "\"";
+	if (game_config->second["config"] != "")
+		cmd += "'|'\"" + game_config->second["config"] + "\"";//Game options have priority
+	//cmd += "\"" + (*config)["base_config"] + "\"";
 	cmd += " " + emulator->second.getValue("options");
-	cmd += " " + game_config->second.getValue("options");
 	cmd += " " + game_config->second.getValue("path");
 
 	std::cout << "[GameManager]\tLaunching " << game << std::endl;
+	std::cout << cmd << std::endl;
 
 	context->pause();
 	system(cmd.c_str());

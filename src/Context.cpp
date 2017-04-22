@@ -70,17 +70,20 @@ void Context::init() {
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 4);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 4);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	window_width = 1280;
+	window_height = 720;
 #else
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-#endif
 
 	//Window size
 	window_width = 640;
 	window_height = 480;
+#endif
 
 	//Window and context creation
 	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
@@ -145,6 +148,8 @@ void Context::resume() {
 #endif
 
 	running = true;
+	SDL_PumpEvents();
+	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 }
 
 
