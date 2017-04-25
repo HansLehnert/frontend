@@ -23,7 +23,7 @@ GameManager::GameManager(Context* p_context, Config* main_config) :
 	init((*config)["rom_path"]);
 
 	scrapDatFiles(&game_list, &emulator_list);
-	//scrapArcadeItalia(&game_list, &emulator_list);
+	scrapArcadeItalia(&game_list, &emulator_list);
 }
 
 

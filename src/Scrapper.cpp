@@ -236,7 +236,7 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 		
 		//Download game logo
 		std::string logo_filename = "logo/" + i.first + ".png";
-		if (!file_exists(logo_filename)) {
+		if (!file_exists(logo_filename) || !file_exists((*game)["game_logo"])) {
 			std::cout << "\t\tMissing logo" << std::endl;
 
 			std::string logo_url = "http://adb.arcadeitalia.net/media/mame.current/decals/" + rom_name + ".png";
@@ -253,7 +253,7 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 
 		//Download game screenshot
 		std::string screenshot_filename = "screenshot/" + i.first + ".png";
-		if (!file_exists(screenshot_filename)) {
+		if (!file_exists(screenshot_filename) || !file_exists((*game)["screenshot"])) {
 			std::cout << "\t\tMissing screenshot" << std::endl;
 
 			std::string screenshot_url = "http://adb.arcadeitalia.net/media/mame.current/ingames/" + rom_name + ".png";

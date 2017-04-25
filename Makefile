@@ -1,6 +1,6 @@
 CC		:= g++
-CFLAGS	:= -std=c++11 -Wall `pkg-config --cflags sdl2 freetype2`
-LFLAGS	:= -lfreetype -lSDL2 -lSDL2_image -lcurl 
+CFLAGS	:= -std=c++11 -Wall `pkg-config --cflags sdl2 SDL2_image freetype2 libcurl`
+LFLAGS	:= `pkg-config --libs sdl2 SDL2_image freetype2 libcurl`
 
 MKDIR	= mkdir
 RM		= rm
@@ -24,10 +24,10 @@ GLSL_FILES := $(wildcard $(SRC_DIR)/$(SHADER_DIR)/*.glsl)
 ifeq ($(RPI), BCM2709)
 	#CPP_FILES := $(filter-out src/Context.cpp, $(CPP_FILES))
 	CFLAGS += -DRASPBERRY_PI
-	LFLAGS += -lEGL -lGLESv2
+	LFLAGS += -L/opt/vc/lib -lEGL -lGLESv2
 else
 	#CPP_FILES := $(filter-out src/Context_Pi.cpp,$(CPP_FILES))
-	CFLAGS += -DGLEW_STATICls
+	CFLAGS += -DGLEW_STATIC
 	LFLAGS += -lGLEW -lGL
 endif
 

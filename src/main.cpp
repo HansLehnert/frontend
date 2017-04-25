@@ -66,6 +66,8 @@ int main() {
 
 	//Game selection (temporal)
 	int selection = 0;
+	title_image.setContent((game_manager.getGameList()->begin()->second)["game_logo"]);
+	marquee.updateImage((game_manager.getGameList()->begin()->second)["screenshot"]);
 	marquee.addListener(EVENT_INPUT_KEYDOWN, [&selection, &game_manager, &marquee, &title_image] (Event event) {
 		if (event.input.key == KEY_DOWN) {
 			selection++;
