@@ -21,6 +21,4 @@ private:
 	std::vector<glm::vec4> model;
 	glm::vec3 position;
 	glm::vec3 color;
-
-	Program program;
 };

@@ -9,6 +9,7 @@
 #include "glm/glm.hpp"
 
 #include "Event.h"
+#include "Program.h"
 
 class Object {
 public:
@@ -46,6 +47,8 @@ protected:
 	glm::vec3 position;
 	glm::vec3 scale;
 	glm::mat4 model_matrix;
+
+	Program* program;
 
 	void computeModelMatrix();
 

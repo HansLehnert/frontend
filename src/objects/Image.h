@@ -24,5 +24,4 @@ private:
 	float shape;
 
 	static GLuint model_buffer;
-	static Program program;
 };
