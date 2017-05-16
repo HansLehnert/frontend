@@ -9,10 +9,11 @@
 #include "Config.h"
 #include "objects/Image.h"
 #include "objects/Text.h"
+#include "Context.h"
 
 class GameManager : public Object {
 public:
-	GameManager(Config*, std::string = "");
+	GameManager(Context*, Config*, std::string = "game_manager");
 	int launchGame(std::string);
 
 	virtual void handleEvent(Event&);
@@ -21,6 +22,8 @@ public:
 private:
 	void init(std::string);
 	void updateUI();
+
+	Context* context;
 
 	Config* config;
 

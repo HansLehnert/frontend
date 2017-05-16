@@ -148,6 +148,21 @@ int Context::poll() {
 }
 
 
+void Context::pause() {
+#ifdef RASPBERRY_PI
+	SDL_GL_DeleteContext(context);
+#endif
+}
+
+
+void Context::resume() {
+#ifdef RASPBERRY_PI
+	context = SDL_GL_CreateContext(window);
+	SDL_GL_MakeCurrent(window, context);
+#endif
+}
+
+
 void Context::swapBuffers() {
 	SDL_GL_SwapWindow(window);
 

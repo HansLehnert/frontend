@@ -16,8 +16,9 @@
 
 const char* rom_ext = ".zip";
 
-GameManager::GameManager(Config* main_config, std::string instance_name) :
+GameManager::GameManager(Context* p_context, Config* main_config, std::string instance_name) :
 	Object(instance_name),
+	context(p_context),
 	config(main_config) {
 
 	init((*config)["rom_path"]);
@@ -118,7 +119,10 @@ int GameManager::launchGame(std::string game) {
 	cmd += " " + game_config->second.getValue("path");
 
 	std::cout << "[GameManager]\tLaunching " << game << std::endl;
+
+	context->pause();
 	system(cmd.c_str());
+	context->resume();
 
 	return 0;
 }

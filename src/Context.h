@@ -7,11 +7,14 @@
 
 class Context : public Object {
 public:
-	Context(std::string = "");
+	Context(std::string = "context");
 
 	virtual void handleEvent(Event&);
 
 	void init();
+
+	void pause();
+	void resume();
 	
 	int poll();
 	void swapBuffers();
