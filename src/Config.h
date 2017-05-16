@@ -6,6 +6,7 @@
 class Config {
 public:
 	Config(std::string);
+	~Config();
 	
 	bool load();
 	bool write();

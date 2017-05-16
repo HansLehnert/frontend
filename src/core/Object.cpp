@@ -8,9 +8,12 @@
 std::unordered_multimap<std::string, Object*> Object::object_list;
 glm::mat4 Object::world_matrix(1);
 
-Object::Object(std::string instance_name) : model_matrix(1) {
-	visible = true;
-	name = instance_name;
+Object::Object(std::string instance_name) :
+	name(instance_name),
+	local_listener(EVENT_NULL),
+	visible(true),
+	model_matrix(1)
+{
 	list_pos = object_list.insert(std::pair<std::string, Object*>(name, this));
 }
 
@@ -41,19 +44,25 @@ void Object::renderAll() {
 	}
 }*/
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 //Event System
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 
-std::vector<std::list<Object*> > Object::listener(EVENT_NULL);
+std::vector<std::list<Object*> > Object::global_listener(EVENT_NULL);
 
-void Object::addListener(EventType type) {
-	listener[type].push_front(this);
+void Object::addListener(EventType type, Object* target) {
+	if (target == nullptr)
+		global_listener[type].push_front(this);
+	else
+		target->local_listener[type].push_front(this);
 }
 
 
-void Object::removeListener(EventType type) {
-	listener[type].remove(this);
+void Object::removeListener(EventType type, Object* target) {
+	if (target == nullptr)
+		global_listener[type].remove(this);
+	else
+		target->local_listener[type].remove(this);		
 }
 
 
@@ -62,14 +71,18 @@ void Object::dispatchEvent(Event& event) {
 
 	event.source = this;
 
-	for (auto object : listener[type]) {
+	for (auto object : global_listener[type]) {
+		object->handleEvent(event);
+	}
+
+	for (auto object : local_listener[type]) {
 		object->handleEvent(event);
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 //Graphic methods
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 
 void Object::setPosition(glm::vec3 pos) {
 	position = pos;

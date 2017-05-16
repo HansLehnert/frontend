@@ -22,14 +22,30 @@ public:
 	virtual void render() {};
 	static void renderAll();
 
-	void addListener(EventType);
-	void removeListener(EventType);
+private:
+	std::string name;
+	static std::unordered_multimap<std::string, Object*> object_list;
+	std::unordered_multimap<std::string, Object*>::iterator list_pos; //Stores position in list
+
+	//////////////////////////////////////////////////////////
+	//Event system
+	//////////////////////////////////////////////////////////
+public:
+	void addListener(EventType, Object* = nullptr);
+	void removeListener(EventType, Object* = nullptr);
 	void dispatchEvent(Event&);
 	virtual void handleEvent(Event&) {};
+	
+private:
+	typedef std::pair<Object*, int> Listener;
 
-	///////////////////////////////////////////////////////////////////////////
+	static std::vector<std::list<Object*> > global_listener;
+	std::vector<std::list<Object*> > local_listener;
+
+	//////////////////////////////////////////////////////////
 	//Graphic members
-	///////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////
+public:
 	bool visible;
 	static glm::mat4 world_matrix;
 
@@ -40,10 +56,6 @@ public:
 	glm::vec3 getScale();
 
 protected:
-	///////////////////////////////////////////////////////////////////////////
-	//Graphic members
-	///////////////////////////////////////////////////////////////////////////
-
 	glm::vec3 position;
 	glm::vec3 scale;
 	glm::mat4 model_matrix;
@@ -51,12 +63,4 @@ protected:
 	Program* program;
 
 	void computeModelMatrix();
-
-private:
-	std::string name;
-	static std::unordered_multimap<std::string, Object*> object_list;
-	std::unordered_multimap<std::string, Object*>::iterator list_pos; //Stores position in list
-
-	typedef std::pair<Object*, int> Listener;
-	static std::vector<std::list<Object*> > listener;
 };

@@ -4,9 +4,16 @@
 #include <string>
 #include <iostream>
 
+
 Config::Config(std::string file) : filename(file) {
 	load();
 }
+
+
+Config::~Config() {
+	write();
+}
+
 
 bool Config::load() {
 	std::ifstream config_file(filename);
@@ -32,6 +39,7 @@ bool Config::load() {
 	}
 }
 
+
 bool Config::write() {
 	std::ofstream config_file(filename);
 
@@ -52,9 +60,11 @@ bool Config::write() {
 	return true;
 }
 
+
 void Config::setValue(std::string key, std::string value) {
 	settings[key] = value;
 }
+
 
 std::string Config::getValue(std::string key, bool* success) {
 	auto search = settings.find(key);
@@ -69,6 +79,7 @@ std::string Config::getValue(std::string key, bool* success) {
 		return std::string("");
 	}
 }
+
 
 std::string Config::operator[](std::string key) {
 	return getValue(key);

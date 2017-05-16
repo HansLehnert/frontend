@@ -17,8 +17,8 @@ Texture::Texture() : loaded(false) {
 Texture::~Texture() {
 	glDeleteTextures(1, &id);
 
-	/*if (loaded)
-		delete image_buffer;*/
+	if (loaded)
+		delete image_buffer;
 	//SOIL_free_image_data(image_buffer);
 	return;
 }

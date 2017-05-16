@@ -66,6 +66,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, std::map<std::str
 			//Parse XML
 			//pugi::xml_parse_result result = dat_xml[i.first].load_buffer(dat_buffer, file_size);
 			dat_xml[i.first].load_buffer(dat_buffer, file_size);
+			delete dat_buffer;
 		}
 	}
 	
