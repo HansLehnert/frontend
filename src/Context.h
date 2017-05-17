@@ -23,8 +23,12 @@ public:
 	int getWindowWidth();
 	int getWindowHeight();
 	float getAspectRatio();
+
+	static int eventFilter(void*, SDL_Event*);
 private:
 	static int sdl_init;
+
+	int running;
 
 	SDL_Window* window;
 	SDL_GLContext context;

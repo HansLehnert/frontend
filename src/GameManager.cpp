@@ -24,8 +24,8 @@ GameManager::GameManager(Context* p_context, Config* main_config, std::string in
 	init((*config)["rom_path"]);
 	selection = game_list.begin();
 
-	Scrapper scrapper;
-	scrapper.scrap(&game_list, &emulator_list);
+	scrapDatFiles(&game_list, &emulator_list);
+	scrapArcadeItalia(&game_list, &emulator_list);
 
 	if (game_list.size() > 0) {
 		addListener(EVENT_INPUT_KEYDOWN);

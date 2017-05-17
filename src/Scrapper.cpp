@@ -22,15 +22,9 @@ size_t write_callback(char* data, size_t size, size_t nmemb, void* dest) {
 }
 
 
-void Scrapper::scrap(std::map<std::string, Config>* game_list, std::map<std::string, Config>* emulator_list) {
+void scrapDatFiles(std::map<std::string, Config>* game_list, std::map<std::string, Config>* emulator_list) {
 	//std::map<std::string, char*> dat_src;
 	std::map<std::string, pugi::xml_document> dat_xml;
-
-	std::cout << "[Scrapper]\tUsing thegamesdb.net" << std::endl;
-
-	curl_global_init(CURL_GLOBAL_ALL);
-	CURL* curl_handle = curl_easy_init();
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
 
 	std::cout << "[Scrapper]\tLoading .dat files" << std::endl;
 	for (auto& i : *emulator_list) {
@@ -69,13 +63,11 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, std::map<std::str
 			delete dat_buffer;
 		}
 	}
-	
+
 	for (auto &i : *game_list) {
 		Config* game = &(i.second);
 
 		std::string game_name = (*game)["game_name"];
-		std::string game_logo = (*game)["game_logo"];
-		std::string game_art = (*game)["game_art"];
 
 		std::cout << "[Scrapper]\tLooking up " << i.first << std::endl;
 
@@ -85,7 +77,7 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, std::map<std::str
 
 			std::string emulator = (*game)["emulator"];
 			if (emulator == "")
-				std::cout << "\t\tMissing emulator" << std::endl;;
+				std::cout << "\t\tMissing emulator" << std::endl;
 
 			//Check all dat files
 			for (auto& dat : dat_xml) {
@@ -109,11 +101,29 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, std::map<std::str
 				}
 			}
 		}
-		
+	}
+}
+
+
+void scrapTheGamesDB(std::map<std::string, Config>* game_list, std::map<std::string, Config>* emulator_list) {
+	std::cout << "[Scrapper]\tUsing thegamesdb.net" << std::endl;
+
+	curl_global_init(CURL_GLOBAL_ALL);
+	CURL* curl_handle = curl_easy_init();
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+
+	for (auto &i : *game_list) {
+		Config* game = &(i.second);
+
+		std::string game_name = (*game)["game_name"];
+		std::string game_logo = (*game)["game_logo"];
+		std::string game_art = (*game)["game_art"];
+
 		//If game doesn't have a name, dont look for info
 		if (game_name == "")
 			continue;
 		
+		std::cout << "[Scrapper]\tLooking up " << i.first << std::endl;
 		
 		std::string clear_name = cleanName(game_name);
 		
@@ -200,7 +210,43 @@ void Scrapper::scrap(std::map<std::string, Config>* game_list, std::map<std::str
 }
 
 
-int Scrapper::getFile(std::string url, std::string* dest, CURL* handle) {
+void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::string, Config>* emulator_list) {
+	std::cout << "[Scrapper]\tUsing adb.arcadeitalia.net" << std::endl;
+
+	curl_global_init(CURL_GLOBAL_ALL);
+	CURL* curl_handle = curl_easy_init();
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
+
+	for (auto &i : *game_list) {
+		std::string rom_name = i.first;
+		Config* game = &(i.second);
+		
+		std::cout << "[Scrapper]\tLooking up " << rom_name << std::endl;
+		
+		//Download game logo
+		if ((*game)["game_logo"] == "") {
+			std::cout << "\t\tMissing logo" << std::endl;
+
+			std::string logo_url = "http://adb.arcadeitalia.net/media/mame.current/decals/" + rom_name + ".png";
+			std::string logo_filename = "logo/" + i.first + ".png";
+
+			if (saveFile(logo_url, logo_filename, curl_handle)) {
+				game->setValue("game_logo", logo_filename);
+				std::cout << "\t\tLogo found" << std::endl;
+			}
+			else {
+				std::cout << "\t\tFailed to load logo" << std::endl;	
+			}
+		}
+
+		game->write();
+	}
+
+	curl_global_cleanup();
+}
+
+
+bool getFile(std::string url, std::string* dest, CURL* handle) {
 	curl_easy_setopt(handle, CURLOPT_URL, url.c_str());
 	curl_easy_setopt(handle, CURLOPT_WRITEDATA, (void*)dest);
 
@@ -210,30 +256,30 @@ int Scrapper::getFile(std::string url, std::string* dest, CURL* handle) {
 	curl_status = curl_easy_perform(handle);
 	curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &http_status);
 	if (curl_status == CURLE_OK && http_status == 200)
-		return 1;
+		return true;
 	else
-		return 0;
+		return false;
 }
 
 
-int Scrapper::saveFile(std::string url, std::string filename, CURL* handle) {
+bool saveFile(std::string url, std::string filename, CURL* handle) {
 	std::string data;
 	if (getFile(url, &data, handle)) {
 		std::ofstream file(filename);
 		if (file.is_open()) {
 			file.write(data.c_str(), data.size());
 			file.close();
-			return 1;
+			return true;
 		}
 
-		return 0;
+		return false;
 	}
 
-	return 0;
+	return false;
 }
 
 
-std::string Scrapper::cleanName(std::string name) {
+std::string cleanName(std::string name) {
 	std::string clean_name;
 
 	//Remove punctuation, version

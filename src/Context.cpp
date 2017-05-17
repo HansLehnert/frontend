@@ -20,6 +20,8 @@ int Context::sdl_init = 0;
 
 
 Context::Context(std::string instance_name) : Object(instance_name) {
+	running = false;
+
 	joystick_axis = {0};
 	joystick_repeat_timer = 0;
 }
@@ -56,8 +58,9 @@ void Context::init() {
 		}
 	}
 
-	//GL context configuration
+	SDL_SetEventFilter(&eventFilter, this);
 
+	//GL context configuration
 #ifdef RASPBERRY_PI
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
@@ -120,7 +123,30 @@ void Context::init() {
 
 	joystick_pos[0] = JOYSTICKPOS_NONE;
 	joystick_pos[1] = JOYSTICKPOS_NONE;
+
+	running = true;
 }
+
+
+void Context::pause() {
+#ifdef RASPBERRY_PI
+	SDL_DestroyWindow(window);
+#endif
+
+	running = false;
+}
+
+
+void Context::resume() {
+#ifdef RASPBERRY_PI
+	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
+
+	SDL_GL_MakeCurrent(window, context);
+#endif
+
+	running = true;
+}
+
 
 int Context::poll() {
 	SDL_Event sdl_event;
@@ -241,22 +267,6 @@ int Context::poll() {
 }
 
 
-void Context::pause() {
-#ifdef RASPBERRY_PI
-	SDL_DestroyWindow(window);
-#endif
-}
-
-
-void Context::resume() {
-#ifdef RASPBERRY_PI
-	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
-
-	SDL_GL_MakeCurrent(window, context);
-#endif
-}
-
-
 void Context::swapBuffers() {
 	SDL_GL_SwapWindow(window);
 
@@ -265,25 +275,7 @@ void Context::swapBuffers() {
 
 
 void Context::handleEvent(Event& event) {
-	/*if (message.type == FE_INPUT) {
-		switch (message.input.event) {
-			case FE_START_LISTEN: {
-				if (message.common.source != NULL)
-					input_stack.push_back(message.input.source);
-				break;
-			}
-			case FE_STOP_LISTEN: {
-				for (auto i = input_stack.begin(); i != input_stack.end(); i++) {
-					if (*i == message.common.source) {
-						input_stack.erase(i);
-					}
-				}
-				break;
-			}
-			default:
-				break;
-		}
-	}*/
+
 }
 
 
@@ -299,4 +291,13 @@ int Context::getWindowHeight() {
 
 float Context::getAspectRatio() {
 	return window_width / (float) window_height;
+}
+
+
+int Context::eventFilter(void* userdata, SDL_Event* event) {
+	Context* context = static_cast<Context*>(userdata);
+	if (context->running)
+		return 1;
+	else
+		return 0;
 }
