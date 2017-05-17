@@ -20,14 +20,28 @@ int Context::sdl_init = 0;
 
 
 Context::Context(std::string instance_name) : Object(instance_name) {
-	
+	joystick_axis = {0};
+}
+
+
+Context::~Context() {
+	//Delete GL context and window
+	SDL_DestroyWindow(window);
+	SDL_GL_DeleteContext(context);
+
+	//Close joysticks
+	for (auto id : joystick_id) {
+		if (SDL_JoystickGetAttached(id) == SDL_TRUE) {
+			SDL_JoystickClose(id);
+		}
+	}
 }
 
 
 void Context::init() {
 	//SDL initialization
 	if (!sdl_init) {
-		if (SDL_InitSubSystem(SDL_INIT_VIDEO) == 0) {
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == 0) {
 			sdl_init = 1;
 			std::cout << "[Context]\tInitialized SDL" << std::endl;
 		}
@@ -91,16 +105,33 @@ void Context::init() {
 	glGenVertexArrays(1, &null_vao);
 	glBindVertexArray(null_vao);
 #endif
+
+	//Initialize joystick
+	int joystick_count = SDL_NumJoysticks();
+	joystick_axis.reserve(2 * joystick_count);
+
+	for (int i = 0; i < joystick_count; i++) {
+		SDL_Joystick* id = SDL_JoystickOpen(i);
+		joystick_id.push_back(id);
+		joystick_axis[2 * i] = 0;
+		joystick_axis[2 * i + 1] = 0;
+
+		std::cout << "[Context]\tFound joystick "
+				  << SDL_JoystickName(id) << std::endl;
+	}
+
+	joystick_pos[0] = JOYSTICKPOS_NONE;
+	joystick_pos[1] = JOYSTICKPOS_NONE;
 }
 
 int Context::poll() {
 	SDL_Event sdl_event;
 	while (SDL_PollEvent(&sdl_event)) {
-        switch (sdl_event.type) {
-        	case SDL_QUIT:
-        		return 0;
+		switch (sdl_event.type) {
+			case SDL_QUIT:
+				return 0;
 
-        	//Handle keyboard input
+			//Handle keyboard input
 			case SDL_KEYDOWN: {
 				Event key_event;
 				key_event.type = EVENT_INPUT_KEYDOWN;
@@ -126,31 +157,93 @@ int Context::poll() {
 				}
 
 				dispatchEvent(key_event);
-				/*message.input.value = event.key.keysym.sym;
-				if (input_stack.size() > 0)
-					input_stack.back()->sendMessage(message);*/
 				break;
 			}
-			/*case SDL_KEYUP: {
-				Message message;
-				message.type = FE_INPUT;
-				message.input.source = this;
-				message.input.event = FE_KEY_UP;
-				message.input.value = event.key.keysym.sym;
-				if (input_stack.size() > 0)
-					input_stack.back()->sendMessage(message);
-				break;
-			}*/
+
+			//Handle joysitcks
+			case SDL_JOYBUTTONDOWN: {
+				Event key_event;
+				key_event.type = EVENT_INPUT_KEYDOWN;
+
+				switch (sdl_event.jbutton.button) {
+					default:
+					key_event.input.key = KEY_SELECT;
+				}
+
+				dispatchEvent(key_event);
+			}
+
+			case SDL_JOYAXISMOTION: {
+				if (sdl_event.jaxis.axis < 2) {
+					unsigned int index;
+					for (index = 0; index < joystick_id.size(); index++) {
+						if (SDL_JoystickInstanceID(joystick_id[index]) == sdl_event.jaxis.which)
+							break;
+					}
+
+					if (index < joystick_id.size()) {
+						joystick_axis[2 * index + sdl_event.jaxis.axis] = sdl_event.jaxis.value;
+					}
+				}
+			}
 		}
 		continue;
-    }
-    return 1;
+	}
+	return 1;
+
+	
+	//Joystick polling
+	float joystick_axis_total[2] = {0};
+	for (unsigned int i = 0; i < joystick_axis.size() / 2; i++) {
+		joystick_axis_total[0] += joystick_axis[2 * i] / 32768.f;
+		joystick_axis_total[1] += joystick_axis[2 * i + 1] / 32768.f;
+	}
+
+	for (int i = 0; i < 2; i++) {
+		if (joystick_axis_total[i] > 0.8)
+			joystick_pos[i] = JOYSTICKPOS_UP;
+		else if (joystick_axis_total[i] < -0.8)
+			joystick_pos[i] = JOYSTICKPOS_DOWN;
+		else
+			joystick_pos[i] = JOYSTICKPOS_NONE;
+	}
+
+	if (joystick_pos[0] != JOYSTICKPOS_NONE || joystick_pos[1] != JOYSTICKPOS_NONE) {
+		if (joystick_repeat_timer == 0 || joystick_repeat_timer == 30) {
+			Event key_event;
+			key_event.type = EVENT_INPUT_KEYDOWN;
+
+			if (joystick_pos[0] == JOYSTICKPOS_UP) {
+				key_event.input.key = KEY_RIGHT;
+			}
+			else if (joystick_pos[0] == JOYSTICKPOS_DOWN) {
+				key_event.input.key = KEY_LEFT;
+			}
+			dispatchEvent(key_event);
+
+			if (joystick_pos[1] == JOYSTICKPOS_UP) {
+				key_event.input.key = KEY_UP;
+			}
+			else if (joystick_pos[1] == JOYSTICKPOS_DOWN) {
+				key_event.input.key = KEY_DOWN;
+			}
+			dispatchEvent(key_event);
+		}
+
+		if (joystick_repeat_timer == 30) {
+			joystick_repeat_timer -= 5;
+		}
+
+		joystick_repeat_timer++;
+	}
+	else {
+		joystick_repeat_timer = 0;
+	}
 }
 
 
 void Context::pause() {
 #ifdef RASPBERRY_PI
-	//SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
 #endif
 }

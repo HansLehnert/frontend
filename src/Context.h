@@ -8,6 +8,7 @@
 class Context : public Object {
 public:
 	Context(std::string = "context");
+	~Context();
 
 	virtual void handleEvent(Event&);
 
@@ -31,5 +32,12 @@ private:
 	int window_width;
 	int window_height;
 
-	//std::vector<Object*> input_stack;
+	std::vector<SDL_Joystick*> joystick_id;
+	std::vector<int> joystick_axis;
+	enum JoystickPosition {
+		JOYSTICKPOS_UP,
+		JOYSTICKPOS_DOWN,
+		JOYSTICKPOS_NONE
+	} joystick_pos[2];
+	int joystick_repeat_timer;
 };
