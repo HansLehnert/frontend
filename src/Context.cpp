@@ -21,6 +21,7 @@ int Context::sdl_init = 0;
 
 Context::Context(std::string instance_name) : Object(instance_name) {
 	joystick_axis = {0};
+	joystick_repeat_timer = 0;
 }
 
 
@@ -108,14 +109,11 @@ void Context::init() {
 
 	//Initialize joystick
 	int joystick_count = SDL_NumJoysticks();
-	joystick_axis.reserve(2 * joystick_count);
+	joystick_axis = std::vector<int>(2 * joystick_count, 0);
 
 	for (int i = 0; i < joystick_count; i++) {
 		SDL_Joystick* id = SDL_JoystickOpen(i);
 		joystick_id.push_back(id);
-		joystick_axis[2 * i] = 0;
-		joystick_axis[2 * i + 1] = 0;
-
 		std::cout << "[Context]\tFound joystick "
 				  << SDL_JoystickName(id) << std::endl;
 	}
@@ -152,8 +150,6 @@ int Context::poll() {
 					case SDLK_RETURN:
 						key_event.input.key = KEY_SELECT;
 						break;
-					default:
-						return 1;
 				}
 
 				dispatchEvent(key_event);
@@ -171,6 +167,7 @@ int Context::poll() {
 				}
 
 				dispatchEvent(key_event);
+				break;
 			}
 
 			case SDL_JOYAXISMOTION: {
@@ -185,18 +182,17 @@ int Context::poll() {
 						joystick_axis[2 * index + sdl_event.jaxis.axis] = sdl_event.jaxis.value;
 					}
 				}
+				break;
 			}
 		}
 		continue;
 	}
-	return 1;
 
-	
 	//Joystick polling
 	float joystick_axis_total[2] = {0};
 	for (unsigned int i = 0; i < joystick_axis.size() / 2; i++) {
-		joystick_axis_total[0] += joystick_axis[2 * i] / 32768.f;
-		joystick_axis_total[1] += joystick_axis[2 * i + 1] / 32768.f;
+		joystick_axis_total[0] += (float)joystick_axis[2 * i] / 32768.f;
+		joystick_axis_total[1] += (float)joystick_axis[2 * i + 1] / 32768.f;
 	}
 
 	for (int i = 0; i < 2; i++) {
@@ -222,16 +218,16 @@ int Context::poll() {
 			dispatchEvent(key_event);
 
 			if (joystick_pos[1] == JOYSTICKPOS_UP) {
-				key_event.input.key = KEY_UP;
+				key_event.input.key = KEY_DOWN;
 			}
 			else if (joystick_pos[1] == JOYSTICKPOS_DOWN) {
-				key_event.input.key = KEY_DOWN;
+				key_event.input.key = KEY_UP;
 			}
 			dispatchEvent(key_event);
 		}
 
 		if (joystick_repeat_timer == 30) {
-			joystick_repeat_timer -= 5;
+			joystick_repeat_timer -= 3;
 		}
 
 		joystick_repeat_timer++;
@@ -239,6 +235,9 @@ int Context::poll() {
 	else {
 		joystick_repeat_timer = 0;
 	}
+	
+
+	return 1;
 }
 
 
