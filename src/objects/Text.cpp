@@ -122,17 +122,19 @@ void Text::updateTexture() {
 		FT_Glyph_Get_CBox(glyphs[n], FT_GLYPH_BBOX_PIXELS, &bounding_box);
 
 		if (n == 0) {
-			offset_x = -bounding_box.xMin >> 6;
+			offset_x = -bounding_box.xMin;
 			width += offset_x;
 		}
 		else if (n == text.length() - 1) {
-			width += (bounding_box.xMax >> 6) + 1;
+			width += bounding_box.xMax + 1;
+		}
+		else {
+			width += ft_face->glyph->advance.x >> 6;
 		}
 
 		glyph_pos[n] = pen.x;
 		pen.x += ft_face->glyph->advance.x >> 6;
 	}
-	width += pen.x;
 
 	unsigned char* bitmap = new unsigned char[width * height * 4];
 	for (unsigned int i = 0; i < width * height; i++) {
