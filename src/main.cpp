@@ -38,7 +38,12 @@ bool createDir(std::string dir_name) {
 
 int main() {
 	Context context;
-	context.init();
+	if (!context.init()) {
+		return 0;
+	}
+
+	Text::initFreetype();
+	Text::loadTypeface("Oswald-Regular.ttf");
 
 	//Create folders
 	if (createDir("game"))
@@ -70,5 +75,5 @@ int main() {
 		Object::renderAll();
 	}
 
-	return 0;
+	return 1;
 }

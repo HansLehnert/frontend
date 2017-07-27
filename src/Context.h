@@ -12,7 +12,7 @@ public:
 
 	virtual void handleEvent(Event&);
 
-	void init();
+	bool init();
 
 	void pause();
 	void resume();

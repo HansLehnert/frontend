@@ -41,7 +41,7 @@ Context::~Context() {
 }
 
 
-void Context::init() {
+bool Context::init() {
 	//SDL initialization
 	if (!sdl_init) {
 		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == 0) {
@@ -50,6 +50,7 @@ void Context::init() {
 		}
 		else {
 			std::cout << "[Context]\tFailed to initialize SDL" << std::endl;
+			return false;
 		}
 
 
@@ -89,13 +90,16 @@ void Context::init() {
 	window = SDL_CreateWindow("Frontend", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
 	if ((context = SDL_GL_CreateContext(window)) == 0) {
 		std::cout << "[Context]\tFailed to create context" << std::endl;
+		return false;
 	}
 
 
 #ifndef RASPBERRY_PI
 	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK)
+	if (glewInit() != GLEW_OK) {
 		std::cout << "[Context]\tGLEW init failed." << std::endl;
+		return false;
+	}
 #endif
 
 	//GL configuration
@@ -126,8 +130,10 @@ void Context::init() {
 
 	joystick_pos[0] = JOYSTICKPOS_NONE;
 	joystick_pos[1] = JOYSTICKPOS_NONE;
+	
 
 	running = true;
+	return true;
 }
 
 

@@ -1,6 +1,6 @@
 CC		:= g++
-CFLAGS	:= -std=c++11 -Wall `sdl2-config --cflags --static-libs`
-LFLAGS	:= -lSDL2 -lSDL2_image -lcurl
+CFLAGS	:= -std=c++11 -Wall `sdl2-config --cflags --static-libs` `freetype-config --cflags --libs`
+LFLAGS	:= -lSDL2 -lSDL2_image -lcurl 
 
 MKDIR	= mkdir
 RM		= rm
