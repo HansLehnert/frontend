@@ -93,7 +93,7 @@ void Text::updateTexture() {
 	int* glyph_pos = new int[text.length()];
 
 	unsigned int glyph_index;
-	//unsigned int previous_index = 0;
+	unsigned int previous_index = 0;
 
 	unsigned int width = 0;
 	unsigned int height = ft_face->size->metrics.height >> 6;
@@ -106,8 +106,8 @@ void Text::updateTexture() {
 	for (unsigned int n = 0; n < text.length(); n++) {
 		glyph_index = FT_Get_Char_Index(ft_face, text[n]);
 
-		//FT_Vector kerning;
-		//FT_Get_Kerning(ft_face, previous_index, glyph_index, FT_KERNING_DEFAULT, &kerning);
+		FT_Vector kerning;
+		FT_Get_Kerning(ft_face, previous_index, glyph_index, FT_KERNING_DEFAULT, &kerning);
 
 		ft_error = FT_Load_Glyph(ft_face, glyph_index, FT_LOAD_DEFAULT);
 		if (ft_error)
@@ -116,24 +116,25 @@ void Text::updateTexture() {
 		ft_error = FT_Get_Glyph(ft_face->glyph, &glyphs[n]);
 		if (ft_error)
 			continue;
-
-		//previous = glyph_index;
 		FT_BBox bounding_box;
 		FT_Glyph_Get_CBox(glyphs[n], FT_GLYPH_BBOX_PIXELS, &bounding_box);
 
 		if (n == 0) {
 			offset_x = -bounding_box.xMin;
-			width += offset_x;
-		}
-		else if (n == text.length() - 1) {
-			width += bounding_box.xMax + 1;
-		}
-		else {
-			width += ft_face->glyph->advance.x >> 6;
+			width += -bounding_box.xMin;
 		}
 
+		if (n == text.length() - 1) {
+			width += bounding_box.xMax + 1;
+		}
+		
+		width += (ft_face->glyph->advance.x >> 6) + (kerning.x >> 6);
+
+		pen.x += -kerning.x >> 6;
 		glyph_pos[n] = pen.x;
 		pen.x += ft_face->glyph->advance.x >> 6;
+
+		previous_index = glyph_index;
 	}
 
 	unsigned char* bitmap = new unsigned char[width * height * 4];

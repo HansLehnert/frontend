@@ -1,8 +1,15 @@
 /*
-Event system for communication between objects
+Event system definitions
 */
 
 #pragma once
+
+
+enum ListenerPriority {
+	PRIORITY_EQUAL,
+	PRIORITY_TOP
+};
+
 
 enum EventType {
 	//Keyboard Events
@@ -11,6 +18,7 @@ enum EventType {
 
 	EVENT_NULL
 };
+
 
 //Input event enums
 
@@ -27,6 +35,7 @@ enum Key {
 
 class Object; //Forward declaration to use pointer
 
+
 struct Event {
 	EventType type;
 	Object* source;
@@ -37,4 +46,14 @@ struct Event {
 			Key key;
 		} input;
 	};
+};
+
+
+typedef std::function<void(Event)> Callback;
+
+
+struct Listener {
+	Object* target;
+	ListenerPriority priority;
+	Callback callback;
 };

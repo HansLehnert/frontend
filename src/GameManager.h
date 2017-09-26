@@ -16,7 +16,7 @@ public:
 	GameManager(Context*, Config*, std::string = "game_manager");
 	int launchGame(std::string);
 
-	virtual void handleEvent(Event&);
+	virtual void handleEvent(Event);
 
 	std::vector<std::string> getGameList();
 private:

@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <functional>
 #include <unordered_map>
 
 #include <SDL2/SDL.h>
@@ -10,6 +11,7 @@
 
 #include "Event.h"
 #include "Program.h"
+
 
 class Object {
 public:
@@ -31,16 +33,17 @@ private:
 	//Event system
 	//////////////////////////////////////////////////////////
 public:
-	void addListener(EventType, Object* = nullptr);
+	void addListener(EventType, Callback, Object* = nullptr, ListenerPriority = PRIORITY_EQUAL);
 	void removeListener(EventType, Object* = nullptr);
+	//void removeListener(Event&);
 	void dispatchEvent(Event&);
-	virtual void handleEvent(Event&) {};
+	//virtual void handleEvent(Event&) {};
 	
 private:
-	typedef std::pair<Object*, int> Listener;
+	//typedef std::pair<Object*, int> Listener;
 
-	static std::vector<std::list<Object*> > global_listener;
-	std::vector<std::list<Object*> > local_listener;
+	static std::vector<std::list<Listener> > global_listeners;
+	std::vector<std::list<Listener> > local_listeners;
 
 	//////////////////////////////////////////////////////////
 	//Graphic members

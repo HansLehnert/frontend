@@ -5,12 +5,14 @@
 #include <list>
 #include "glm/glm.hpp"
 
+
 std::unordered_multimap<std::string, Object*> Object::object_list;
 glm::mat4 Object::world_matrix(1);
 
+
 Object::Object(std::string instance_name) :
 	name(instance_name),
-	local_listener(EVENT_NULL),
+	local_listeners(EVENT_NULL),
 	visible(true),
 	model_matrix(1)
 {
@@ -48,35 +50,43 @@ void Object::renderAll() {
 //Event System
 //////////////////////////////////////////////////////////
 
-std::vector<std::list<Object*> > Object::global_listener(EVENT_NULL);
+std::vector<std::list<Listener> > Object::global_listeners(EVENT_NULL);
 
-void Object::addListener(EventType type, Object* target) {
-	if (target == nullptr)
-		global_listener[type].push_front(this);
+void Object::addListener(EventType type, Callback callback, Object* source, ListenerPriority priority) {
+	Listener listener;
+	listener.target = this;
+	listener.priority = priority;
+	listener.callback = callback;
+
+	if (source == nullptr)
+		global_listeners[type].push_front(listener);
 	else
-		target->local_listener[type].push_front(this);
+		source->local_listeners[type].push_front(listener);
 }
 
 
 void Object::removeListener(EventType type, Object* target) {
-	if (target == nullptr)
+	/*if (target == nullptr)
 		global_listener[type].remove(this);
 	else
-		target->local_listener[type].remove(this);		
+		target->local_listener[type].remove(this);*/
 }
 
 
 void Object::dispatchEvent(Event& event) {
 	EventType type = event.type;
-
 	event.source = this;
 
-	for (auto object : global_listener[type]) {
-		object->handleEvent(event);
+	for (auto& listener : global_listeners[type]) {
+		listener.callback(event);
+		if (listener.priority == PRIORITY_TOP)
+			break;
 	}
 
-	for (auto object : local_listener[type]) {
-		object->handleEvent(event);
+	for (auto& listener : local_listeners[type]) {
+		listener.callback(event);
+		if (listener.priority == PRIORITY_TOP)
+			break;
 	}
 }
 

@@ -28,7 +28,7 @@ GameManager::GameManager(Context* p_context, Config* main_config, std::string in
 	scrapArcadeItalia(&game_list, &emulator_list);
 
 	if (game_list.size() > 0) {
-		addListener(EVENT_INPUT_KEYDOWN);
+		addListener(EVENT_INPUT_KEYDOWN, std::bind(&GameManager::handleEvent, this, std::placeholders::_1));
 		updateUI();
 	}
 	else {
@@ -162,7 +162,7 @@ void GameManager::updateUI() {
 }
 
 
-void GameManager::handleEvent(Event& event) {
+void GameManager::handleEvent(Event event) {
 	if (event.type == EVENT_INPUT_KEYDOWN) {
 		switch (event.input.key) {
 			case KEY_DOWN:
