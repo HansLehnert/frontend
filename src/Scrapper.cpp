@@ -236,34 +236,46 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 		
 		//Download game logo
 		std::string logo_filename = "logo/" + i.first + ".png";
-		if (!file_exists(logo_filename) || !file_exists((*game)["game_logo"])) {
-			std::cout << "\t\tMissing logo" << std::endl;
-
-			std::string logo_url = "http://adb.arcadeitalia.net/media/mame.current/decals/" + rom_name + ".png";
-
-			if (saveFile(logo_url, logo_filename, curl_handle)) {
+		if (!file_exists((*game)["game_logo"])) {
+			if (file_exists(logo_filename)) {
+				//File exists but is not in the config file
 				game->setValue("game_logo", logo_filename);
-				std::cout << "\t\tLogo found" << std::endl;
 			}
 			else {
-				std::cout << "\t\tFailed to load logo" << std::endl;	
+				std::cout << "\t\tMissing logo" << std::endl;
+
+				std::string logo_url = "http://adb.arcadeitalia.net/media/mame.current/decals/" + rom_name + ".png";
+
+				if (saveFile(logo_url, logo_filename, curl_handle)) {
+					game->setValue("game_logo", logo_filename);
+					std::cout << "\t\tLogo found" << std::endl;
+				}
+				else {
+					std::cout << "\t\tFailed to load logo" << std::endl;	
+				}
 			}
 		}
 
 
 		//Download game screenshot
 		std::string screenshot_filename = "screenshot/" + i.first + ".png";
-		if (!file_exists(screenshot_filename) || !file_exists((*game)["screenshot"])) {
-			std::cout << "\t\tMissing screenshot" << std::endl;
-
-			std::string screenshot_url = "http://adb.arcadeitalia.net/media/mame.current/ingames/" + rom_name + ".png";
-
-			if (saveFile(screenshot_url, screenshot_filename, curl_handle)) {
+		if (!file_exists((*game)["screenshot"])) {
+			if (file_exists(screenshot_filename)) {
+				//File exists but is not in the config file
 				game->setValue("screenshot", screenshot_filename);
-				std::cout << "\t\tScreenshot found" << std::endl;
 			}
 			else {
-				std::cout << "\t\tFailed to load screenshot" << std::endl;	
+				std::cout << "\t\tMissing screenshot" << std::endl;
+
+				std::string screenshot_url = "http://adb.arcadeitalia.net/media/mame.current/ingames/" + rom_name + ".png";
+
+				if (saveFile(screenshot_url, screenshot_filename, curl_handle)) {
+					game->setValue("screenshot", screenshot_filename);
+					std::cout << "\t\tScreenshot found" << std::endl;
+				}
+				else {
+					std::cout << "\t\tFailed to load screenshot" << std::endl;	
+				}
 			}
 		}
 
