@@ -6,10 +6,10 @@
 
 
 Background::Background(int div, std::string instance_name) : Object(instance_name), grid_div(div){
-	model.push_back(glm::vec4(-2, -2, 1, 1));
-	model.push_back(glm::vec4(-2, 2, 1, 1));
-	model.push_back(glm::vec4(2, 2, 1, 1));
-	model.push_back(glm::vec4(2, -2, 1, 1));
+	model.push_back(glm::vec4(-4, -4, 1, 1));
+	model.push_back(glm::vec4(-4, 4, 1, 1));
+	model.push_back(glm::vec4(4, 4, 1, 1));
+	model.push_back(glm::vec4(4, -4, 1, 1));
 
 	for (int i = -div; i <= div; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -54,8 +54,8 @@ void Background::render() {
 
 void Background::update() {
 	time++;
-	position.x = remainder(10 * sin(time * 0.0007), 4.0 / grid_div);
-	position.y = remainder(5 * sin(time * 0.0031), 4.0 / grid_div);
+	position.x = remainder(10 * sin(time * 0.00021), 4.0 / grid_div);
+	position.y = remainder(5 * sin(time * 0.00093), 4.0 / grid_div);
 	//position.z = remainder(sin(time * 0.011), 1 / 4.0);
 
 	/*color.x = 0.5 * (1 + sin(time * 0.023));

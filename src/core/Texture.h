@@ -9,13 +9,17 @@ public:
 	Texture();
 	~Texture();
 
-	int loadFile(std::string, GLuint = GL_LINEAR);
-	void loadData(const unsigned char*, int, int, int = 4, GLuint = GL_LINEAR);
+	int loadFile(std::string filename, GLuint filter = GL_LINEAR);
+	void loadData(const unsigned char* data, int w, int h, int c = 4, GLuint filter = GL_LINEAR);
+
+	//Texture copying
+	Texture& operator=(Texture& a);
+
 
 	bool isLoaded();
-	GLuint getId();
 	int getWidth();
 	int getHeight();
+	GLuint getId();
 	const unsigned char* getData();
 private:
 	bool loaded;
@@ -25,5 +29,5 @@ private:
 	int width;
 	int height;
 
-	void bufferTexture(GLuint);
+	void bufferTexture(GLuint filter);
 };

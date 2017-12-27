@@ -14,7 +14,7 @@ FT_Library Text::ft_library;
 FT_Face Text::ft_face;
 
 
-Text::Text(std::string text, std::string instance_name) : Image("", instance_name) {
+Text::Text(std::string text) {
 	setText(text);
 };
 
@@ -163,9 +163,9 @@ void Text::updateTexture() {
 		FT_Done_Glyph(glyphs[n]);
 	}
 
-	texture.loadData(bitmap, width, height, 4, GL_LINEAR);
-	setScale(glm::vec3(width, height, 0) * 0.001f);
-	setPosition(glm::vec3(0));
+	loadData(bitmap, width, height, 4, GL_LINEAR);
+	//setScale(glm::vec3(width, height, 0) * 0.001f);
+	//setPosition(glm::vec3(0));
 
 	delete bitmap;
 	delete glyphs;

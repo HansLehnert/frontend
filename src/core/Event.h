@@ -39,6 +39,7 @@ class Object; //Forward declaration to use pointer
 struct Event {
 	EventType type;
 	Object* source;
+	//std::list<Listener>::iterator listener;
 
 	union {
 		//Input Events

@@ -11,6 +11,17 @@
 #include "pugi/pugixml.hpp"
 #include "Config.h"
 
+
+bool file_exists(std::string filename) {
+	std::ifstream file(filename);
+	bool result = file.good();
+	file.close();
+
+	return result;
+}
+
+
+
 //Callback for curl
 size_t write_callback(char* data, size_t size, size_t nmemb, void* dest) {
 	std::string* dest_string = (std::string*)dest;
@@ -224,11 +235,11 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 		std::cout << "[Scrapper]\tLooking up " << rom_name << std::endl;
 		
 		//Download game logo
-		if ((*game)["game_logo"] == "") {
+		std::string logo_filename = "logo/" + i.first + ".png";
+		if (!file_exists(logo_filename)) {
 			std::cout << "\t\tMissing logo" << std::endl;
 
 			std::string logo_url = "http://adb.arcadeitalia.net/media/mame.current/decals/" + rom_name + ".png";
-			std::string logo_filename = "logo/" + i.first + ".png";
 
 			if (saveFile(logo_url, logo_filename, curl_handle)) {
 				game->setValue("game_logo", logo_filename);
@@ -236,6 +247,23 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 			}
 			else {
 				std::cout << "\t\tFailed to load logo" << std::endl;	
+			}
+		}
+
+
+		//Download game screenshot
+		std::string screenshot_filename = "screenshot/" + i.first + ".png";
+		if (!file_exists(screenshot_filename)) {
+			std::cout << "\t\tMissing screenshot" << std::endl;
+
+			std::string screenshot_url = "http://adb.arcadeitalia.net/media/mame.current/ingames/" + rom_name + ".png";
+
+			if (saveFile(screenshot_url, screenshot_filename, curl_handle)) {
+				game->setValue("screenshot", screenshot_filename);
+				std::cout << "\t\tScreenshot found" << std::endl;
+			}
+			else {
+				std::cout << "\t\tFailed to load screenshot" << std::endl;	
 			}
 		}
 

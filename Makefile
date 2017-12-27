@@ -1,6 +1,6 @@
 CC		:= g++
-CFLAGS	:= -std=c++11 -Wall `sdl2-config --cflags --static-libs` `freetype-config --cflags --libs`
-LFLAGS	:= -lSDL2 -lSDL2_image -lcurl 
+CFLAGS	:= -std=c++11 -Wall `pkg-config --cflags sdl2 freetype2`
+LFLAGS	:= -lfreetype -lSDL2 -lSDL2_image -lcurl 
 
 MKDIR	= mkdir
 RM		= rm
@@ -42,6 +42,7 @@ all: $(OUT_DIR)/$(BIN_NAME) $(O_FILES) $(SHADER_FILES)
 	@$(MKDIR) -p $(OUT_DIR)/emulator
 	@$(MKDIR) -p $(OUT_DIR)/game
 	@$(MKDIR) -p $(OUT_DIR)/logo
+	@$(MKDIR) -p $(OUT_DIR)/screenshot
 
 $(BIN_DIR)/%.o: %.cpp
 	@$(MKDIR) -p $(dir $@)

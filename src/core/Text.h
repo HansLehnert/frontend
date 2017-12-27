@@ -8,13 +8,12 @@
 #include "../gl_inc.h"
 #include "glm/glm.hpp"
 
-#include "Image.h"
 #include "core/Object.h"
 #include "core/Texture.h"
 
-class Text: public Image {
+class Text: public Texture {
 public:
-	Text(std::string = "", std::string = "");
+	Text(std::string = "");
 
 	void setText(std::string);
 	std::string getText();

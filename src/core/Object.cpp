@@ -1,6 +1,7 @@
 #include "core/Object.h"
 
 #include <iostream>
+#include <algorithm>
 
 #include <list>
 #include "glm/glm.hpp"
@@ -13,9 +14,12 @@ glm::mat4 Object::world_matrix(1);
 Object::Object(std::string instance_name) :
 	name(instance_name),
 	local_listeners(EVENT_NULL),
-	visible(true),
-	model_matrix(1)
+	visible(true)
 {
+	position = glm::vec3(0);
+	scale = glm::vec3(1);
+	computeModelMatrix();
+
 	list_pos = object_list.insert(std::pair<std::string, Object*>(name, this));
 }
 
@@ -65,11 +69,23 @@ void Object::addListener(EventType type, Callback callback, Object* source, List
 }
 
 
-void Object::removeListener(EventType type, Object* target) {
-	/*if (target == nullptr)
-		global_listener[type].remove(this);
-	else
-		target->local_listener[type].remove(this);*/
+void Object::removeListener(EventType type, Object* source) {
+	if (source == nullptr) {
+		global_listeners[type].erase(
+			std::remove_if(
+				global_listeners[type].begin(),
+				global_listeners[type].end(),
+				[this] (Listener& l) { return l.target == this; }),
+			global_listeners[type].end());
+	}
+	else {
+		source->local_listeners[type].erase(
+			std::remove_if(
+				source->local_listeners[type].begin(),
+				source->local_listeners[type].end(),
+				[this] (Listener& l) { return l.target == this; }),
+			source->local_listeners[type].end());
+	}
 }
 
 

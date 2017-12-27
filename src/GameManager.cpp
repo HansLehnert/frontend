@@ -7,7 +7,6 @@
 #include <dirent.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <SDL2/SDL_keycode.h>
 
 #include "core/Event.h"
 #include "Config.h"
@@ -16,25 +15,15 @@
 
 const char* rom_ext = ".zip";
 
-GameManager::GameManager(Context* p_context, Config* main_config, std::string instance_name) :
-	Object(instance_name),
+GameManager::GameManager(Context* p_context, Config* main_config) :
 	context(p_context),
-	config(main_config) {
+	config(main_config)
+{
 
 	init((*config)["rom_path"]);
-	selection = game_list.begin();
 
 	scrapDatFiles(&game_list, &emulator_list);
-	scrapArcadeItalia(&game_list, &emulator_list);
-
-	if (game_list.size() > 0) {
-		addListener(EVENT_INPUT_KEYDOWN, std::bind(&GameManager::handleEvent, this, std::placeholders::_1));
-		updateUI();
-	}
-	else {
-		game_title.visible = false;
-		game_logo.visible = false;
-	}
+	//scrapArcadeItalia(&game_list, &emulator_list);
 }
 
 
@@ -132,57 +121,10 @@ int GameManager::launchGame(std::string game) {
 }
 
 
-std::vector<std::string> GameManager::getGameList() {
-	std::vector<std::string> result;
+std::map<std::string, Config>* GameManager::getGameList() {
+	/*std::vector<std::string> result;
 	for (auto game : game_list) {
 		result.push_back(game.first);
-	}
-	return result;
-}
-
-
-void GameManager::updateUI() {
-	if (game_logo.setContent(selection->second.getValue("game_logo"))) {
-		game_logo.setSize(glm::vec2(0.6, 0.2));
-		game_logo.visible = 1;
-
-		game_title.visible = 0;
-	}
-	else {
-		game_logo.visible = 0;
-
-
-		std::string game_name = selection->second["game_name"];
-		if (game_name == "")
-			game_name = selection->first;
-		game_name = game_name.substr(0, game_name.find("("));
-		game_title.setText(game_name);
-		game_title.visible = 1;
-	}
-}
-
-
-void GameManager::handleEvent(Event event) {
-	if (event.type == EVENT_INPUT_KEYDOWN) {
-		switch (event.input.key) {
-			case KEY_DOWN:
-				if (selection != (--game_list.end()))
-					selection++;
-				updateUI();
-				break;
-
-			case KEY_UP:
-				if (selection != game_list.begin())
-					selection--;
-				updateUI();
-				break;
-
-			case KEY_SELECT:
-				launchGame(selection->first);
-				break;
-
-			default:
-				break;
-		}
-	}
+	}*/
+	return &game_list;
 }

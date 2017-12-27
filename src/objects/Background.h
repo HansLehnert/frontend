@@ -1,11 +1,11 @@
 #pragma once
 
+#include "core/Object.h"
 #include <vector>
 
 #include "gl_inc.h"
 #include "glm/glm.hpp"
 #include "core/Program.h"
-#include "core/Object.h"
 
 class Background : public Object {
 public:

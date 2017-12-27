@@ -7,20 +7,20 @@
 #include "core/Object.h"
 
 #include "Config.h"
+#include "core/Text.h"
 #include "objects/Image.h"
-#include "objects/Text.h"
+#include "objects/IconGrid.h"
+#include "objects/Marquee.h"
 #include "Context.h"
 
-class GameManager : public Object {
+class GameManager {
 public:
-	GameManager(Context*, Config*, std::string = "game_manager");
+	GameManager(Context* p_context, Config* main_config);
 	int launchGame(std::string);
 
-	virtual void handleEvent(Event);
-
-	std::vector<std::string> getGameList();
+	std::map<std::string, Config>* getGameList();
 private:
-	void init(std::string);
+	void init(std::string rom_path);
 	void updateUI();
 
 	Context* context;
@@ -29,9 +29,4 @@ private:
 
 	std::map<std::string, Config> game_list;
 	std::map<std::string, Config> emulator_list;
-
-	std::map<std::string, Config>::iterator selection;
-
-	Image game_logo;
-	Text game_title;
 };

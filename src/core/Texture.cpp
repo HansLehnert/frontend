@@ -24,6 +24,13 @@ Texture::~Texture() {
 }
 
 
+Texture& Texture::operator=(Texture& a) {
+	loadData(a.image_buffer, a.width, a.height);
+
+	return *this;
+}
+
+
 int Texture::loadFile(std::string filename, GLuint filter) {
 	SDL_Surface* surface = IMG_Load(filename.c_str());
 
@@ -36,10 +43,12 @@ int Texture::loadFile(std::string filename, GLuint filter) {
 
 		SDL_FreeSurface(surface_rgba);		
 		SDL_FreeSurface(surface);
+		loaded = true;
 		return 1;
 	}
 	else {
 		std::cout << "[Texture]\tFailed to load " << filename << std::endl;
+		loaded = false;
 		return 0;
 	}
 
