@@ -1,6 +1,6 @@
 #include "Scrapper.h"
 
-#include <map> 
+#include <map>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -39,10 +39,9 @@ void scrapDatFiles(std::map<std::string, Config>* game_list, std::map<std::strin
 
 	std::cout << "[Scrapper]\tLoading .dat files" << std::endl;
 	for (auto& i : *emulator_list) {
-		bool dat_exists;
-		std::string dat_path = i.second.getValue("dat_file", &dat_exists);
+		std::string dat_path = i.second["dat_file"];
 
-		if (dat_exists) {
+		if (dat_path != "") {
 			std::cout << "[Scrapper]\tFor emulator "
 			          << i.first
 			          << " reading "
@@ -99,12 +98,12 @@ void scrapDatFiles(std::map<std::string, Config>* game_list, std::map<std::strin
 				for (pugi::xml_node& node : dat.second.child("datafile").children("game")) {
 					if (node.attribute("name").value() == i.first) {
 						game_name = node.child("description").child_value();
-						game->setValue("game_name", game_name);
+						(*game)["game_name"] = game_name;
 						std::cout << "\t\tNew name: " << game_name << std::endl;
 
 						if (emulator == "") {
 							emulator = dat.first;
-							game->setValue("emulator", emulator);
+							(*game)["emulator"] = emulator;
 							std::cout << "\t\tNew emulator: " << emulator << std::endl;
 						}
 						break;
@@ -133,11 +132,11 @@ void scrapTheGamesDB(std::map<std::string, Config>* game_list, std::map<std::str
 		//If game doesn't have a name, dont look for info
 		if (game_name == "")
 			continue;
-		
+
 		std::cout << "[Scrapper]\tLooking up " << i.first << std::endl;
-		
+
 		std::string clear_name = cleanName(game_name);
-		
+
 		if (game_logo == "") {
 			std::cout << "\t\tMissing logo" << std::endl;
 
@@ -202,11 +201,11 @@ void scrapTheGamesDB(std::map<std::string, Config>* game_list, std::map<std::str
 			if (found) {
 				std::string logo_filename = "logo/" + i.first + ".png";
 				if (saveFile(base_img_url + logo_url, logo_filename, curl_handle)) {
-					game->setValue("game_logo", logo_filename);
+					(*game)["game_logo"] = logo_filename;
 					std::cout << "\t\tLogo found" << std::endl;
 				}
 				else {
-					std::cout << "\t\tFailed to load logo" << std::endl;	
+					std::cout << "\t\tFailed to load logo" << std::endl;
 				}
 			}
 			else {
@@ -231,15 +230,15 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 	for (auto &i : *game_list) {
 		std::string rom_name = i.first;
 		Config* game = &(i.second);
-		
+
 		std::cout << "[Scrapper]\tLooking up " << rom_name << std::endl;
-		
+
 		//Download game logo
 		std::string logo_filename = "logo/" + i.first + ".png";
 		if (!file_exists((*game)["game_logo"])) {
 			if (file_exists(logo_filename)) {
 				//File exists but is not in the config file
-				game->setValue("game_logo", logo_filename);
+				(*game)["game_logo"] = logo_filename;
 			}
 			else {
 				std::cout << "\t\tMissing logo" << std::endl;
@@ -247,11 +246,11 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 				std::string logo_url = "http://adb.arcadeitalia.net/media/mame.current/decals/" + rom_name + ".png";
 
 				if (saveFile(logo_url, logo_filename, curl_handle)) {
-					game->setValue("game_logo", logo_filename);
+					(*game)["game_logo"] = logo_filename;
 					std::cout << "\t\tLogo found" << std::endl;
 				}
 				else {
-					std::cout << "\t\tFailed to load logo" << std::endl;	
+					std::cout << "\t\tFailed to load logo" << std::endl;
 				}
 			}
 		}
@@ -262,7 +261,7 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 		if (!file_exists((*game)["screenshot"])) {
 			if (file_exists(screenshot_filename)) {
 				//File exists but is not in the config file
-				game->setValue("screenshot", screenshot_filename);
+				(*game)["screenshot"] = screenshot_filename;
 			}
 			else {
 				std::cout << "\t\tMissing screenshot" << std::endl;
@@ -270,11 +269,11 @@ void scrapArcadeItalia(std::map<std::string, Config>* game_list, std::map<std::s
 				std::string screenshot_url = "http://adb.arcadeitalia.net/media/mame.current/ingames/" + rom_name + ".png";
 
 				if (saveFile(screenshot_url, screenshot_filename, curl_handle)) {
-					game->setValue("screenshot", screenshot_filename);
+					(*game)["screenshot"] = screenshot_filename;
 					std::cout << "\t\tScreenshot found" << std::endl;
 				}
 				else {
-					std::cout << "\t\tFailed to load screenshot" << std::endl;	
+					std::cout << "\t\tFailed to load screenshot" << std::endl;
 				}
 			}
 		}

@@ -47,19 +47,9 @@ void GameManager::init(std::string rom_path) {
 
 			if (extension == rom_ext) {
 				Config game_config("game/" + game_name);
-				bool has_value;
 
-				game_config.getValue("emulator", &has_value);
-				if (!has_value)
-					game_config.setValue("emulator", "");
-
-				game_config.getValue("launch_options", &has_value);
-				if (!has_value)
-					game_config.setValue("launch_options", "");
-
-				game_config.getValue("path", &has_value);
-				if (!has_value)
-					game_config.setValue("path", rom_path + "/" + file_name);
+				if (game_config["path"] == "")
+					game_config["path"] = rom_path + "/" + file_name;
 
 				game_list.insert(std::pair<std::string, Config>(game_name, game_config));
 			}
@@ -94,21 +84,21 @@ int GameManager::launchGame(std::string game) {
 	if (game_config == game_list.end()) {
 		return -1;
 	}
-	
-	auto emulator = emulator_list.find(game_config->second.getValue("emulator"));
+
+	auto emulator = emulator_list.find(game_config->second["emulator"]);
 	if (emulator == emulator_list.end()) {
 		return -1;
 	}
 
 	std::string cmd = "";
 	cmd += (*config)["emulator_path"];
-	cmd += " -L " + emulator->second.getValue("path");
+	cmd += " -L " + emulator->second["path"];
 	cmd += " --appendconfig \"" + (*config)["base_config"] + "\"";
 	if (game_config->second["config"] != "")
 		cmd += "'|'\"" + game_config->second["config"] + "\"";//Game options have priority
 	//cmd += "\"" + (*config)["base_config"] + "\"";
-	cmd += " " + emulator->second.getValue("options");
-	cmd += " " + game_config->second.getValue("path");
+	cmd += " " + emulator->second["options"];
+	cmd += " " + game_config->second["path"];
 
 	std::cout << "[GameManager]\tLaunching " << game << std::endl;
 	std::cout << cmd << std::endl;

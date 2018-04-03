@@ -61,26 +61,12 @@ bool Config::write() {
 }
 
 
-void Config::setValue(std::string key, std::string value) {
-	settings[key] = value;
-}
-
-
-std::string Config::getValue(std::string key, bool* success) {
+std::string& Config::operator[](const std::string& key) {
 	auto search = settings.find(key);
 	if (search != settings.end()) {
-		if (success != NULL)
-			*success = true;
 		return search->second;
 	}
 	else {
-		if (success != NULL)
-			*success = false;
-		return std::string("");
+		return settings[key] = "";
 	}
-}
-
-
-std::string Config::operator[](std::string key) {
-	return getValue(key);
 }

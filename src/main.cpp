@@ -51,12 +51,11 @@ int main() {
 		std::cout << "[System]\tCreated 'logo' directory" << std::endl;
 	if (createDir("dat"))
 		std::cout << "[System]\tCreated 'dat' directory" << std::endl;
+	if (createDir("screenshot"))
+		std::cout << "[System]\tCreated 'screenshot' directory" << std::endl;
 
 
 	Config main_config("settings");
-	main_config.setValue("rom_path", main_config["rom_path"]);
-	main_config.setValue("emulator_path", main_config["emulator_path"]);
-
 
 	GameManager game_manager(&context, &main_config);
 

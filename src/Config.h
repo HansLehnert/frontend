@@ -5,17 +5,13 @@
 
 class Config {
 public:
-	Config(std::string);
+	Config(std::string filename);
 	~Config();
-	
+
 	bool load();
 	bool write();
 
-	void setValue(std::string, std::string);
-
-
-	std::string getValue(std::string, bool* = NULL);
-	std::string operator[](std::string);
+	std::string& operator[](const std::string& key);
 private:
 	std::string filename;
 	std::map<std::string, std::string> settings;
