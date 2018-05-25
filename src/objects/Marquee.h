@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/Object.h"
+#include "core/GraphicObject.h"
 
 #include "core/Texture.h"
 
-class Marquee : public Object {
+class Marquee : public GraphicObject {
 public:
 	Marquee(std::string instance_name = "");
 

@@ -1,15 +1,14 @@
 #pragma once
 
-#include "core/Object.h"
-
 #include "gl_inc.h"
 
+#include "core/GraphicObject.h"
 #include "core/Program.h"
 #include "core/Texture.h"
 #include "core/Text.h"
 
 
-class IconGrid : public Object {
+class IconGrid : public GraphicObject {
 public:
 	IconGrid(std::string instance_name = "");
 
@@ -34,15 +33,15 @@ private:
 
 	//GL shaders
 	Program* image_program;
-	GLuint image_uniform_world_matrix;	
-	GLuint image_uniform_model_matrix;	
-	GLuint image_uniform_texture;	
+	GLuint image_uniform_world_matrix;
+	GLuint image_uniform_model_matrix;
+	GLuint image_uniform_texture;
 
 	//Icon properties
 	struct Icon {
 		std::string id;
 		std::string name;
-		Text name_texture;	
+		Text name_texture;
 		Texture icon_texture;
 	};
 	std::vector<Icon> icons;

@@ -19,7 +19,7 @@ const glm::vec4 model[] = {
 //////////////////////////////////////////////////////////
 
 IconGrid::IconGrid(std::string instance_name) :
-	Object(instance_name)
+	GraphicObject(instance_name)
 {
 	//Icon properties
 	//this should be able to be modified in the future

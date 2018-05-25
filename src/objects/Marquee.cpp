@@ -20,8 +20,8 @@ const glm::vec4 model[] = {
 //////////////////////////////////////////////////////////
 
 
-Marquee::Marquee(std::string instance_name) : 
-	Object(instance_name)
+Marquee::Marquee(std::string instance_name) :
+	GraphicObject(instance_name)
 {
 	glGenBuffers(1, &model_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
@@ -97,7 +97,7 @@ void Marquee::render() {
 
 	glUniform1f(uniform_current_aspect, current_aspect);
 	glUniform1f(uniform_next_aspect, next_aspect);
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, current_image.getId());
 	glActiveTexture(GL_TEXTURE1);

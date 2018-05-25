@@ -100,10 +100,10 @@ int main() {
 	});
 
 	//Set the world matrix for vertical orientation
-	Object::world_matrix[0][0] = 0;
-	Object::world_matrix[0][1] = 1;
-	Object::world_matrix[1][0] = -1 / context.getAspectRatio();
-	Object::world_matrix[1][1] = 0;
+	GraphicObject::world_matrix[0][0] = 0;
+	GraphicObject::world_matrix[0][1] = 1;
+	GraphicObject::world_matrix[1][0] = -1 / context.getAspectRatio();
+	GraphicObject::world_matrix[1][1] = 0;
 
 
 	float marquee_position = context.getAspectRatio() - 0.5;
@@ -116,7 +116,7 @@ int main() {
 	while (context.poll()) {
 		context.swapBuffers();
 		Object::updateAll();
-		Object::renderAll();
+		GraphicObject::renderAll();
 	}
 
 	return 1;

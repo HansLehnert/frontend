@@ -1,16 +1,18 @@
 #pragma once
 
 #include <string>
+
 #include "../gl_inc.h"
 #include "glm/glm.hpp"
-#include "core/Object.h"
+
+#include "core/GraphicObject.h"
 #include "core/Texture.h"
 #include "core/Program.h"
 
-class Image: public Object {
+class Image: public GraphicObject {
 public:
 	Image(std::string = "", std::string = "");
-	
+
 	virtual void render();
 
 	int setContent(std::string);

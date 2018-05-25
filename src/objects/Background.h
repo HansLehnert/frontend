@@ -1,13 +1,14 @@
 #pragma once
 
-#include "core/Object.h"
 #include <vector>
 
 #include "gl_inc.h"
 #include "glm/glm.hpp"
+
+#include "core/GraphicObject.h"
 #include "core/Program.h"
 
-class Background : public Object {
+class Background : public GraphicObject {
 public:
 	Background(int, std::string = "");
 

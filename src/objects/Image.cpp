@@ -29,7 +29,9 @@ GLuint Image::model_buffer = 0;
 //Member functions
 //////////////////////////////////////////////////////////
 
-Image::Image(std::string image_file, std::string instance_name) : Object(instance_name) {
+Image::Image(std::string image_file, std::string instance_name) :
+	GraphicObject(instance_name)
+{
 	if (image_file.length() > 0)
 		setContent(image_file);
 
@@ -37,7 +39,7 @@ Image::Image(std::string image_file, std::string instance_name) : Object(instanc
 		glGenBuffers(1, &model_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(model), model, GL_STATIC_DRAW);
-		
+
 		//glEnableVertexAttribArray(0);
 		//glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
