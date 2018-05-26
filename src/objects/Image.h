@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "../gl_inc.h"
 #include "glm/glm.hpp"
@@ -11,19 +12,32 @@
 
 class Image: public GraphicObject {
 public:
-	Image(std::string = "", std::string = "");
+	/**
+	 * @brief Construct a new Image object
+	 */
+	Image(std::string image_file = "", std::string instance_name = "");
 
 	virtual void render();
 
-	int setContent(std::string);
-	void setSize(glm::vec2);
+	/**
+	 * @brief Loads an image file to load as content.
+	 */
+	int setContent(std::string image_file);
+
+
+	/**
+	 * @brief Sets the bounding box size used to fit the image
+	 */
+	void setBounds(glm::vec2 bounds);
 
 protected:
 	Texture texture;
 
 private:
 	std::string content;
-	float shape;
+	glm::vec2 bounds;
 
 	static GLuint model_buffer;
+
+	void updateSize();
 };

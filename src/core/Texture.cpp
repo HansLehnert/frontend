@@ -14,6 +14,19 @@ Texture::Texture() : loaded(false) {
 }
 
 
+Texture::Texture(const Texture& texture) {
+	*this = texture;
+}
+
+
+Texture::Texture(Texture&& texture) {
+	id = texture.id;
+	width = texture.width;
+	height = texture.height;
+	image_buffer = texture.image_buffer;
+}
+
+
 Texture::~Texture() {
 	glDeleteTextures(1, &id);
 
@@ -24,7 +37,7 @@ Texture::~Texture() {
 }
 
 
-Texture& Texture::operator=(Texture& a) {
+Texture& Texture::operator=(const Texture& a) {
 	loadData(a.image_buffer, a.width, a.height);
 
 	return *this;
@@ -41,7 +54,7 @@ int Texture::loadFile(std::string filename, GLuint filter) {
 
 		loadData((unsigned char*)surface_rgba->pixels, surface->w, surface->h, 4, filter);
 
-		SDL_FreeSurface(surface_rgba);		
+		SDL_FreeSurface(surface_rgba);
 		SDL_FreeSurface(surface);
 		loaded = true;
 		return 1;

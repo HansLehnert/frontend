@@ -11,7 +11,10 @@
 #include "core/Object.h"
 #include "core/Texture.h"
 
-class Text: public Texture {
+/**
+ * @brief Draws text into a texture.
+ */
+class Text : public Texture {
 public:
 	Text(std::string = "");
 

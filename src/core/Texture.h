@@ -2,18 +2,36 @@
 
 #include <string>
 
-#include "../gl_inc.h"
+#include "gl_inc.h"
 
 class Texture {
 public:
 	Texture();
+	Texture(const Texture& texture);
+	Texture(Texture&& texture);
 	~Texture();
 
+	/**
+	 * @brief Read texture data from file.
+	 */
 	int loadFile(std::string filename, GLuint filter = GL_LINEAR);
-	void loadData(const unsigned char* data, int w, int h, int c = 4, GLuint filter = GL_LINEAR);
 
-	//Texture copying
-	Texture& operator=(Texture& a);
+	/**
+	 * @brief Load texture from raw data.
+	 */
+	void loadData(
+		const unsigned char* data,
+		int width,
+		int height,
+		int channels = 4,
+		GLuint filter = GL_LINEAR);
+
+	/**
+	 * @brief Copy texture
+	 *
+	 * Creates a new GL image buffer with identical data.
+	 */
+	Texture& operator=(const Texture& a);
 
 
 	bool isLoaded();

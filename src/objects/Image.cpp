@@ -35,6 +35,7 @@ Image::Image(std::string image_file, std::string instance_name) :
 	if (image_file.length() > 0)
 		setContent(image_file);
 
+	// Initialize the quad model buffer for rendering the image
 	if (model_buffer == 0) {
 		glGenBuffers(1, &model_buffer);
 		glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
@@ -49,26 +50,6 @@ Image::Image(std::string image_file, std::string instance_name) :
 
 	program = Program::getProgram("image");
 };
-
-
-void Image::setSize(glm::vec2 size) {
-	if (size.x / size.y > shape)
-		setScale(glm::vec3(size.y * shape, size.y, 1));
-	else
-		setScale(glm::vec3(size.x, size.x / shape, 1));
-}
-
-
-int Image::setContent(std::string image_file) {
-	if (texture.loadFile(image_file)) {
-		shape = texture.getWidth() / (float)texture.getHeight();
-		setSize(glm::vec2(0.5));
-		return 1;
-	}
-	else {
-		return 0;
-	}
-}
 
 
 void Image::render() {
@@ -86,4 +67,31 @@ void Image::render() {
 	glBindTexture(GL_TEXTURE_2D, texture.getId());
 
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+}
+
+
+void Image::setBounds(glm::vec2 new_bounds) {
+	bounds = new_bounds;
+	updateSize();
+}
+
+
+int Image::setContent(std::string image_file) {
+	if (texture.loadFile(image_file)) {
+		updateSize();
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+
+void Image::updateSize() {
+	float ratio = texture.getWidth() / (float)texture.getHeight();
+
+	if (bounds.x / bounds.y > ratio)
+		setScale(glm::vec3(bounds.y * ratio, bounds.y, 1));
+	else
+		setScale(glm::vec3(bounds.x, bounds.x / ratio, 1));
 }

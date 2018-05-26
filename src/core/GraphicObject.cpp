@@ -64,6 +64,11 @@ void GraphicObject::setScale(glm::vec3 s) {
 }
 
 
+void GraphicObject::setScale(float sx, float sy, float sz) {
+	setScale(glm::vec3(sx, sy, sz));
+}
+
+
 glm::vec3 GraphicObject::getScale() {
 	return scale;
 }

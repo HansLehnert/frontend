@@ -22,6 +22,7 @@ public:
 	glm::vec3 getPosition();
 
 	void setScale(glm::vec3 new_scale);
+	void setScale(float sx = 1, float sy = 1, float sz = 1);
 	glm::vec3 getScale();
 
 private:
