@@ -1,30 +1,26 @@
-#include "core/GraphicObject.h"
+#include "core/GraphicObject.hpp"
 
 
-ObjectMap<GraphicObject> GraphicObject::object_list;
 glm::mat4 GraphicObject::world_matrix(1);
 
 
 GraphicObject::GraphicObject(std::string instance_name) :
     Object(instance_name)
 {
-	object_list_ref = object_list.insert({instance_name, this});
-
     visible = true;
     position = glm::vec3(0);
     scale = glm::vec3(1);
 
-    updateModelMatrix();
+    computeModelMatrix();
 }
 
 
-GraphicObject::GraphicObject(GraphicObject& obj) {
-	*this = obj;
-}
+// GraphicObject::GraphicObject(GraphicObject& obj) {
+// 	*this = obj;
+//}
 
 
 GraphicObject::~GraphicObject() {
-	object_list.erase(object_list_ref);
 }
 
 
@@ -39,51 +35,45 @@ GraphicObject::~GraphicObject() {
 // }
 
 
-void GraphicObject::renderAll() {
-	for (auto& object : object_list) {
-		if (object.second->visible)
-			object.second->render();
+void GraphicObject::step() {
+    update();
+
+    // Compute the transformation matrix using parent model matrix
+    model_matrix = computeModelMatrix();
+
+    if (!parent.expired()) {
+        std::shared_ptr<GraphicObject> graphic_parent =
+            std::dynamic_pointer_cast<GraphicObject>(parent.lock());
+
+        if (graphic_parent) {
+            model_matrix = graphic_parent->model_matrix * model_matrix;
+        }
+    }
+
+	if (visible) {
+    	render();
 	}
+
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        if (children[i] != nullptr) {
+            children[i]->step();
+        }
+    }
 }
 
 
-void GraphicObject::setPosition(glm::vec3 pos) {
-	position = pos;
-	updateModelMatrix();
-}
+glm::mat4 GraphicObject::computeModelMatrix() {
+	glm::mat4 matrix = glm::mat4(1);
 
+	// Position
+	matrix[3][0] = x;
+	matrix[3][1] = y;
+	matrix[3][2] = z;
 
-glm::vec3 GraphicObject::getPosition() {
-	return position;
-}
+    // Scale
+    matrix[0][0] = scale.x;
+    matrix[1][1] = scale.y;
+    matrix[2][2] = scale.z;
 
-
-void GraphicObject::setScale(glm::vec3 s) {
-	scale = s;
-	updateModelMatrix();
-}
-
-
-void GraphicObject::setScale(float sx, float sy, float sz) {
-	setScale(glm::vec3(sx, sy, sz));
-}
-
-
-glm::vec3 GraphicObject::getScale() {
-	return scale;
-}
-
-
-void GraphicObject::updateModelMatrix() {
-	model_matrix = glm::mat4(1);
-
-	//Position
-	model_matrix[3][0] = position.x;
-	model_matrix[3][1] = position.y;
-	model_matrix[3][2] = position.z;
-
-	//Scale
-	model_matrix[0][0] = scale.x;
-	model_matrix[1][1] = scale.y;
-	model_matrix[2][2] = scale.z;
+	return matrix;
 }
