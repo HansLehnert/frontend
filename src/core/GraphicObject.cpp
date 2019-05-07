@@ -17,7 +17,7 @@ GraphicObject::GraphicObject(std::string instance_name) :
 
 // GraphicObject::GraphicObject(GraphicObject& obj) {
 // 	*this = obj;
-//}
+// }
 
 
 GraphicObject::~GraphicObject() {
@@ -54,10 +54,8 @@ void GraphicObject::step() {
     	render();
 	}
 
-    for (int i = 0; i < MAX_CHILDREN; i++) {
-        if (children[i] != nullptr) {
-            children[i]->step();
-        }
+    for (std::shared_ptr<Object>& child : children) {
+        child->step();
     }
 }
 

@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <functional>
-#include <unordered_map>
 #include <memory>
 
 #include <SDL2/SDL.h>
@@ -12,9 +10,6 @@
 
 #include "core/ObjectMap.h"
 #include "core/Event.h"
-
-
-const unsigned int MAX_CHILDREN = 4;
 
 
 class Object : public std::enable_shared_from_this<Object> {
@@ -51,9 +46,7 @@ protected:
     std::string instance_name;
 
     std::weak_ptr<Object> parent;
-    std::shared_ptr<Object> children[MAX_CHILDREN];
-
-    //typedef std::pair<Object*, int> Listener;
+    std::vector<std::shared_ptr<Object>> children;
 
 private:
     static std::vector<std::list<Listener> > global_listeners;
