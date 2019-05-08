@@ -14,5 +14,11 @@ public:
 
     virtual void render();
 
+    // Scale the image size to fit a bounding box, while preserving the aspect
+    // ratio of the texture
+    void fitBounds(float max_width, float max_height);
+
     std::shared_ptr<Texture> texture;
+    glm::vec4 tint;
+    float opacity;
 };

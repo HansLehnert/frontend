@@ -11,6 +11,5 @@ void main() {
 	//gl_Position = position;
 	gl_Position = world_matrix * model_matrix * position;
 
-	vertex_uv.x = position.x <= 0.0 ? 0.0 : 1.0;
-	vertex_uv.y = position.y <= 0.0 ? 1.0 : 0.0;
+	vertex_uv = position.xy;
 }
