@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/Object.hpp"
-#include "core/Program.h"
+#include "core/Program.hpp"
 
 
 class GraphicObject : public Object {
@@ -9,18 +9,18 @@ public:
     GraphicObject(std::string instance_name);
     GraphicObject(GraphicObject& obj);
 
-	~GraphicObject();
+    ~GraphicObject();
 
-	//GraphicObject& operator=(GraphicObject& obj);
+    //GraphicObject& operator=(GraphicObject& obj);
 
-	virtual void step();
-	virtual void render() {};
+    virtual void step();
+    virtual void render() {};
 
-	bool visible;
-	static glm::mat4 world_matrix;
+    bool visible;
+    static glm::mat4 world_matrix;
 
-	// Position
-	union {
+    // Position
+    union {
         glm::vec3 position;
         struct {
             float x;
@@ -29,14 +29,14 @@ public:
         };
     };
 
-	// Scale
-	glm::vec3 scale;
+    // Scale
+    glm::vec3 scale;
 
 protected:
-	Program* program;
+    Program* program;
 
-	glm::mat4 model_matrix;
+    glm::mat4 model_matrix;
 
 private:
-	glm::mat4 computeModelMatrix();
+    glm::mat4 computeModelMatrix();
 };

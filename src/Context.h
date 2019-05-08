@@ -2,46 +2,62 @@
 
 #include <vector>
 #include <SDL2/SDL.h>
-#include "core/Object.h"
-#include "core/Event.h"
+#include "core/Object.hpp"
 
 class Context : public Object {
 public:
-	Context(std::string = "context");
-	~Context();
+    Context(std::string = "context");
+    ~Context();
 
-	virtual void handleEvent(Event&);
+    bool init();
 
-	bool init();
+    void pause();
+    void resume();
 
-	void pause();
-	void resume();
-	
-	int poll();
-	void swapBuffers();
+    int poll();
+    void swapBuffers();
 
-	int getWindowWidth();
-	int getWindowHeight();
-	float getAspectRatio();
+    int getWindowWidth();
+    int getWindowHeight();
+    float getAspectRatio();
 
-	static int eventFilter(void*, SDL_Event*);
+    static int eventFilter(void*, SDL_Event*);
 private:
-	static int sdl_init;
+    static int sdl_init;
 
-	int running;
+    int running;
 
-	SDL_Window* window;
-	SDL_GLContext context;
+    SDL_Window* window;
+    SDL_GLContext context;
 
-	int window_width;
-	int window_height;
+    int window_width;
+    int window_height;
 
-	std::vector<SDL_Joystick*> joystick_id;
-	std::vector<int> joystick_axis;
-	enum JoystickPosition {
-		JOYSTICKPOS_UP,
-		JOYSTICKPOS_DOWN,
-		JOYSTICKPOS_NONE
-	} joystick_pos[2];
-	int joystick_repeat_timer;
+    std::vector<SDL_Joystick*> joystick_id;
+    std::vector<int> joystick_axis;
+
+    enum JoystickPosition {
+        JOYSTICKPOS_UP,
+        JOYSTICKPOS_DOWN,
+        JOYSTICKPOS_NONE
+    } joystick_pos[2];
+
+    int joystick_repeat_timer;
+
+    struct InputEvent {
+        enum class Type {
+            KEYDOWN,
+            KEYUP
+        } type;
+
+        enum class Key {
+            KEY_UP,
+            KEY_RIGHT,
+            KEY_DOWN,
+            KEY_LEFT,
+            KEY_SELECT
+        } key;
+    };
+
+    void dispatchEvent(InputEvent& event);
 };

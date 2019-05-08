@@ -50,7 +50,8 @@ void GraphicObject::step() {
         }
     }
 
-	if (visible) {
+	if (visible && program != nullptr) {
+        glUseProgram(program->getId());
     	render();
 	}
 

@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 
 
-Object::Object(std::string instance_name) : local_listeners(EVENT_NULL) {
+Object::Object(std::string instance_name) {
     this->instance_name = instance_name;
 }
 
@@ -30,8 +30,6 @@ Object::~Object() {
             child->parent = std::weak_ptr<Object>();
         }
     }
-
-    std::cout << "Destroyed " << instance_name << std::endl;
 }
 
 
@@ -40,59 +38,6 @@ void Object::step() {
 
     for (std::shared_ptr<Object>& child : children) {
         child->step();
-    }
-}
-
-
-std::vector<std::list<Listener> > Object::global_listeners(EVENT_NULL);
-
-void Object::addListener(EventType type, Callback callback, Object* source, ListenerPriority priority) {
-    Listener listener;
-    listener.target = this;
-    listener.priority = priority;
-    listener.callback = callback;
-
-    if (source == nullptr)
-        global_listeners[type].push_front(listener);
-    else
-        source->local_listeners[type].push_front(listener);
-}
-
-
-void Object::removeListener(EventType type, Object* source) {
-    if (source == nullptr) {
-        global_listeners[type].erase(
-            std::remove_if(
-                global_listeners[type].begin(),
-                global_listeners[type].end(),
-                [this] (Listener& l) { return l.target == this; }),
-            global_listeners[type].end());
-    }
-    else {
-        source->local_listeners[type].erase(
-            std::remove_if(
-                source->local_listeners[type].begin(),
-                source->local_listeners[type].end(),
-                [this] (Listener& l) { return l.target == this; }),
-            source->local_listeners[type].end());
-    }
-}
-
-
-void Object::dispatchEvent(Event& event) {
-    EventType type = event.type;
-    event.source = this;
-
-    for (auto& listener : global_listeners[type]) {
-        listener.callback(event);
-        if (listener.priority == PRIORITY_TOP)
-            break;
-    }
-
-    for (auto& listener : local_listeners[type]) {
-        listener.callback(event);
-        if (listener.priority == PRIORITY_TOP)
-            break;
     }
 }
 
