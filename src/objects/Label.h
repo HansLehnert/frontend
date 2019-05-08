@@ -1,6 +1,7 @@
 #pragma once
 
-#include "objects/Image.h"
+#include "ui/Image.hpp"
+#include "core/Text.hpp"
 
 /**
  * @brief Text label object
@@ -28,6 +29,8 @@ public:
      * @brief Set the vertical size of the label
      */
     void setFontSize(float size);
+
+    TextFormat style;
 
 private:
     std::string text;
