@@ -3,11 +3,7 @@
 #include "ui/Image.hpp"
 #include "core/Text.hpp"
 
-/**
- * @brief Text label object
- *
- * Used for rendering text.
- */
+// Text label object. Render a single line of text.
 class Label : public Image {
 public:
     /**
@@ -18,7 +14,7 @@ public:
     /**
      * @brief Set the text value of the label
      */
-    void setText(std::string new_text);
+    void setText(std::string text);
 
     /**
      * @brief Get the text value
@@ -28,7 +24,7 @@ public:
     /**
      * @brief Set the vertical size of the label
      */
-    void setFontSize(float size);
+    void setLineHeight(float line_height);
 
     TextFormat style;
 
