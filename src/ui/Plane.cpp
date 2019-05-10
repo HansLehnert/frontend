@@ -8,12 +8,16 @@
 
 
 // Model data
-const glm::vec4 vertex_data[] = {
-    glm::vec4(0, 0, 0, 1),
-    glm::vec4(1, 0, 0, 1),
-    glm::vec4(1, 1, 0, 1),
-    glm::vec4(0, 1, 0, 1),
-    glm::vec4(0, 0, 0, 1),
+struct Vertex {
+    float x, y, z, w, u, v;
+};
+
+const std::array<Vertex, 5> base_vertex_data = {
+    0, 0, 0, 1, 0, 0,
+    1, 0, 0, 1, 1, 0,
+    1, 1, 0, 1, 1, 1,
+    0, 1, 0, 1, 0, 1,
+    0, 0, 0, 1, 0, 0,
 };
 
 
@@ -21,14 +25,30 @@ GLuint Plane::model_buffer = 0;
 
 
 Plane::Plane(std::string instance_name) :
-        GraphicObject(instance_name)
+        GraphicObject(instance_name),
+        origin(Plane::Origin::TOP_LEFT)
 {
     // Initialize the quad model buffer for rendering the image
     if (model_buffer == 0) {
+        // Generate vertex data for each origin position
+        std::array<Vertex, base_vertex_data.size() * 9> vertex_data;
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < base_vertex_data.size(); j++) {
+                int index = base_vertex_data.size() * i + j;
+                vertex_data[index] = base_vertex_data[j];
+                vertex_data[index].x -= 0.5 * (i % 3);
+                vertex_data[index].y -= 0.5 * (i / 3);
+            }
+        }
+
         glGenBuffers(1, &model_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
         glBufferData(
-            GL_ARRAY_BUFFER, sizeof(vertex_data), vertex_data, GL_STATIC_DRAW);
+            GL_ARRAY_BUFFER,
+            sizeof(vertex_data),
+            vertex_data.data(),
+            GL_STATIC_DRAW
+        );
     }
 
     program = Program::getProgram("image");
@@ -37,10 +57,20 @@ Plane::Plane(std::string instance_name) :
 
 void Plane::render() {
     glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
+	glVertexAttribPointer(
+        1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));
 
-    glUniformMatrix4fv(program->uniformLocation("model_matrix"), 1, GL_FALSE, (float*)&model_matrix);
-    glUniformMatrix4fv(program->uniformLocation("world_matrix"), 1, GL_FALSE, (float*)&world_matrix);
+    glUniformMatrix4fv(
+        program->uniformLocation("model_matrix"),
+        1,
+        GL_FALSE,
+        (float*)&model_matrix);
+    glUniformMatrix4fv(
+        program->uniformLocation("world_matrix"),
+        1,
+        GL_FALSE,
+        (float*)&world_matrix);
 
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glDrawArrays(GL_TRIANGLE_FAN, base_vertex_data.size() * (int)origin, 4);
 }
