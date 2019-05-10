@@ -26,8 +26,6 @@ public:
      */
     void setLineHeight(float line_height);
 
-    TextFormat style;
-
 private:
     std::string text;
 };

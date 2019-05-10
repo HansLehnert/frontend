@@ -14,12 +14,6 @@
 #include "core/Texture.hpp"
 
 
-// Text style settings for rendering text
-struct TextFormat {
-    int font_size;
-};
-
-
 // Initialize the freetype library
 bool initFreetype();
 
@@ -27,4 +21,4 @@ bool initFreetype();
 bool loadTypeface(std::string font_name);
 
 // Renders text into a Texture
-std::shared_ptr<Texture> renderText(std::string text, TextFormat format);
+std::shared_ptr<Texture> renderText(std::string text);

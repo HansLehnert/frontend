@@ -15,7 +15,7 @@ Label::Label(std::string label_text, std::string instance_name) :
 void Label::setText(std::string text) {
     this->text = text;
 
-    texture = renderText(text, style);
+    texture = renderText(text);
     scale.x = scale.y / texture->getHeight() * texture->getWidth();
 }
 

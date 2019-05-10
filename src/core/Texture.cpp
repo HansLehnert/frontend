@@ -19,7 +19,6 @@ Texture::~Texture() {
 
 std::shared_ptr<Texture> Texture::fromFile(
         std::string filename, GLuint filter) {
-    std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
 
@@ -29,19 +28,26 @@ std::shared_ptr<Texture> Texture::fromFile(
         surface_rgba = SDL_ConvertSurfaceFormat(
             surface, SDL_PIXELFORMAT_ABGR8888, 0);
 
-        texture->width = surface->w;
-        texture->height = surface->h;
-        texture->channels = 4;
-        texture->bufferData((unsigned char*)surface_rgba->pixels, filter);
+        std::shared_ptr<Texture> texture = Texture::fromData(
+            (unsigned char*)surface_rgba->pixels,
+            surface->w,
+            surface->h,
+            4,
+            filter
+        );
 
         SDL_FreeSurface(surface_rgba);
         SDL_FreeSurface(surface);
+
+        return texture;
     }
     else {
         std::cout << "[Texture]\tFailed to load " << filename << std::endl;
-    }
 
-    return texture;
+        // If texture fails to return a 1x1 blank texture
+        unsigned char data[4] = {0};
+        return Texture::fromData(data, 1, 1);
+    }
 }
 
 

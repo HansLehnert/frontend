@@ -1,6 +1,7 @@
 #include "Text.hpp"
 
 #include <string>
+#include <vector>
 #include <iostream>
 
 #include FT_GLYPH_H
@@ -47,28 +48,22 @@ bool loadTypeface(std::string font_name) {
 }
 
 
-std::shared_ptr<Texture> renderText(std::string text, TextFormat format) {
+std::shared_ptr<Texture> renderText(std::string text) {
     FT_Error ft_error;
 
-    FT_Glyph* glyphs = new FT_Glyph[text.length()];
-    int* glyph_pos = new int[text.length()];
+    std::vector<FT_Glyph> glyphs(text.length());
+    std::vector<FT_Vector> glyph_positions(text.length());
 
-    unsigned int glyph_index;
-    unsigned int previous_index = 0;
+    unsigned int bitmap_width;
+    unsigned int bitmap_height = ft_face->size->metrics.height >> 6;
 
-    unsigned int width = 0;
-    unsigned int height = ft_face->size->metrics.height >> 6;
-    int offset_x;
-    int offset_y = ft_face->size->metrics.ascender >> 6;
+    FT_UInt16 previous_glyph_index; // Used for kerning
 
-    FT_Vector pen;
-    pen.x = 0;
+    FT_Pos advance;
 
     for (unsigned int n = 0; n < text.length(); n++) {
-        glyph_index = FT_Get_Char_Index(ft_face, text[n]);
-
-        FT_Vector kerning;
-        FT_Get_Kerning(ft_face, previous_index, glyph_index, FT_KERNING_DEFAULT, &kerning);
+        // Load the glyph
+        FT_UInt glyph_index = FT_Get_Char_Index(ft_face, text[n]);
 
         ft_error = FT_Load_Glyph(ft_face, glyph_index, FT_LOAD_DEFAULT);
         if (ft_error)
@@ -77,29 +72,52 @@ std::shared_ptr<Texture> renderText(std::string text, TextFormat format) {
         ft_error = FT_Get_Glyph(ft_face->glyph, &glyphs[n]);
         if (ft_error)
             continue;
-        FT_BBox bounding_box;
-        FT_Glyph_Get_CBox(glyphs[n], FT_GLYPH_BBOX_PIXELS, &bounding_box);
 
+        // Compute glyph position
         if (n == 0) {
-            offset_x = -bounding_box.xMin;
-            width += -bounding_box.xMin;
+            FT_BBox bounding_box;
+            FT_Glyph_Get_CBox(glyphs[n], FT_GLYPH_BBOX_GRIDFIT, &bounding_box);
+
+            glyph_positions[n].x = -bounding_box.xMin;
+            glyph_positions[n].y = -ft_face->size->metrics.ascender;
+        }
+        else {
+            glyph_positions[n] = glyph_positions[n - 1];
+            glyph_positions[n].x += advance;
+
+            if (FT_HAS_KERNING(ft_face)) {
+                FT_Vector kerning;
+                FT_Get_Kerning(
+                    ft_face,
+                    previous_glyph_index,
+                    glyph_index,
+                    FT_KERNING_DEFAULT,
+                    &kerning
+                );
+
+                glyph_positions[n].x += kerning.x;
+            }
         }
 
+        // On the last glyph, the bounding box is used to calculate the total
+        // bitmap width
         if (n == text.length() - 1) {
-            width += bounding_box.xMax + 1;
+            FT_BBox bounding_box;
+            FT_Glyph_Get_CBox(glyphs[n], FT_GLYPH_BBOX_GRIDFIT, &bounding_box);
+
+            bitmap_width = glyph_positions[n].x + bounding_box.xMax;
+            bitmap_width = (bitmap_width + 63) >> 6; // Ceil divide
         }
 
-        width += (ft_face->glyph->advance.x >> 6) + (kerning.x >> 6);
-
-        pen.x += -kerning.x >> 6;
-        glyph_pos[n] = pen.x;
-        pen.x += ft_face->glyph->advance.x >> 6;
-
-        previous_index = glyph_index;
+        advance = ft_face->glyph->metrics.horiAdvance;
+        previous_glyph_index = glyph_index;
     }
 
-    unsigned char* bitmap = new unsigned char[width * height * 4];
-    for (unsigned int i = 0; i < width * height; i++) {
+
+    std::vector<unsigned char> bitmap(bitmap_width * bitmap_height * 4);
+    // The bitmap is initialized as transparent white. The alpha channel will
+    // hold the glyph bitmaps
+    for (unsigned int i = 0; i < bitmap.size() / 4; i++) {
         bitmap[i *  4] = 255;
         bitmap[i *  4 + 1] = 255;
         bitmap[i *  4 + 2] = 255;
@@ -107,17 +125,24 @@ std::shared_ptr<Texture> renderText(std::string text, TextFormat format) {
     }
 
     for (unsigned int n = 0; n < text.length(); n++) {
-        pen.x = offset_x + glyph_pos[n];
-        pen.y = offset_y;
+        // Get the glyph bitmap
+        FT_Glyph_To_Bitmap(
+            &glyphs[n], FT_RENDER_MODE_NORMAL, &glyph_positions[n], 0);
+        FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyphs[n];
 
-        FT_Glyph_To_Bitmap(&glyphs[n], FT_RENDER_MODE_NORMAL, &pen, 0);
-        FT_BitmapGlyph bit = (FT_BitmapGlyph)glyphs[n];
+        // Copy glyph to the texture bitmap
+        int k = 0;
+        for (unsigned int i = 0; i < bitmap_glyph->bitmap.rows; i++) {
+            for (unsigned int j = 0; j < bitmap_glyph->bitmap.width; j++) {
+                unsigned int dst_index = 3 + 4 * (j
+                    + bitmap_glyph->left
+                    + bitmap_width * (i - bitmap_glyph->top)
+                );
 
-        for (unsigned int i = 0; i < bit->bitmap.width; i++) {
-            for (unsigned int j = 0; j < bit->bitmap.rows; j++) {
-                unsigned int pixel_offset = (i + pen.x + bit->left + width * (j + pen.y - bit->top)) * 4 + 3;
-                if (pixel_offset < width * height * 4)
-                    bitmap[pixel_offset] = bit->bitmap.buffer[i + bit->bitmap.pitch * j];
+                if (dst_index < bitmap.size()) {
+                    bitmap[dst_index] = bitmap_glyph->bitmap.buffer[
+                        j + bitmap_glyph->bitmap.pitch * i];
+                }
             }
         }
 
@@ -125,11 +150,7 @@ std::shared_ptr<Texture> renderText(std::string text, TextFormat format) {
     }
 
     std::shared_ptr<Texture> texture = Texture::fromData(
-        bitmap, width, height, 4, GL_LINEAR);
-
-    delete[] bitmap;
-    delete[] glyphs;
-    delete[] glyph_pos;
+        bitmap.data(), bitmap_width, bitmap_height, 4, GL_LINEAR);
 
     return texture;
 }

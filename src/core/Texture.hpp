@@ -25,9 +25,7 @@ public:
      * @brief Read texture data from file.
      */
     static std::shared_ptr<Texture> fromFile(
-        std::string filename,
-        GLuint filter = GL_LINEAR
-    );
+        std::string filename, GLuint filter = GL_LINEAR);
 
 
     int getWidth();
