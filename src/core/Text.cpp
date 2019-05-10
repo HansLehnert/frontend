@@ -126,9 +126,14 @@ std::shared_ptr<Texture> renderText(std::string text) {
 
     for (unsigned int n = 0; n < text.length(); n++) {
         // Get the glyph bitmap
-        FT_Glyph_To_Bitmap(
-            &glyphs[n], FT_RENDER_MODE_NORMAL, &glyph_positions[n], 0);
+        ft_error = FT_Glyph_To_Bitmap(
+            &glyphs[n], FT_RENDER_MODE_NORMAL, &glyph_positions[n], 1);
         FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyphs[n];
+
+        if (ft_error) {
+            FT_Done_Glyph(glyphs[n]);
+            continue;
+        }
 
         // Copy glyph to the texture bitmap
         int k = 0;
