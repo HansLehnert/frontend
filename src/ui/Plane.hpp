@@ -23,13 +23,13 @@ public:
 
     enum class Origin {
         TOP_LEFT,
-        TOP_CENTER,
+        TOP,
         TOP_RIGHT,
-        CENTER_LEFT,
+        LEFT,
         CENTER,
-        CENTER_RIGHT,
+        RIGHT,
         BOTTOM_LEFT,
-        BOTTOM_CENTER,
+        BOTTOM,
         BOTTOM_RIGHT
     } origin;
 
