@@ -32,7 +32,6 @@ std::shared_ptr<Texture> Texture::fromFile(
             (unsigned char*)surface_rgba->pixels,
             surface->w,
             surface->h,
-            4,
             filter
         );
 
@@ -55,21 +54,26 @@ std::shared_ptr<Texture> Texture::fromData(
         const unsigned char* data,
         unsigned int width,
         unsigned int height,
-        unsigned int channels,
-        GLuint filter
+        GLuint filter,
+        GLenum format,
+        GLenum type
 ) {
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
     texture->width = width;
     texture->height = height;
-    texture->channels = channels;
-    texture->bufferData(data, filter);
+    texture->bufferData(data, filter, format, type);
 
     return texture;
 }
 
 
-void Texture::bufferData(const unsigned char* data, GLuint filter) {
+void Texture::bufferData(
+        const unsigned char* data,
+        GLuint filter,
+        GLenum format,
+        GLenum type
+) {
     glBindTexture(GL_TEXTURE_2D, id);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

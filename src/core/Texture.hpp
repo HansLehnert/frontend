@@ -17,8 +17,9 @@ public:
         const unsigned char* data,
         unsigned int width,
         unsigned int height,
-        unsigned int channels = 4,
-        GLuint filter = GL_LINEAR
+        GLuint filter = GL_LINEAR,
+        GLenum format = GL_RGBA,
+        GLenum type = GL_UNSIGNED_INT
     );
 
     /**
@@ -37,7 +38,11 @@ private:
 
     unsigned int width;
     unsigned int height;
-    unsigned int channels;
 
-    void bufferData(const unsigned char* data, GLuint filter);
+    void bufferData(
+        const unsigned char* data,
+        GLuint filter,
+        GLenum format,
+        GLenum type
+    );
 };

@@ -155,7 +155,7 @@ std::shared_ptr<Texture> renderText(std::string text) {
     }
 
     std::shared_ptr<Texture> texture = Texture::fromData(
-        bitmap.data(), bitmap_width, bitmap_height, 4, GL_LINEAR);
+        bitmap.data(), bitmap_width, bitmap_height, GL_LINEAR);
 
     return texture;
 }
