@@ -51,7 +51,7 @@ std::shared_ptr<Texture> Texture::fromFile(
 
 
 std::shared_ptr<Texture> Texture::fromData(
-        const unsigned char* data,
+        const void* data,
         unsigned int width,
         unsigned int height,
         GLuint filter,
@@ -69,7 +69,7 @@ std::shared_ptr<Texture> Texture::fromData(
 
 
 void Texture::bufferData(
-        const unsigned char* data,
+        const void* data,
         GLuint filter,
         GLenum format,
         GLenum type
@@ -88,8 +88,8 @@ void Texture::bufferData(
         width,
         height,
         0,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
+        format,
+        type,
         data
     );
 }
@@ -102,6 +102,11 @@ GLuint Texture::getId() {
 
 int Texture::getWidth() {
     return width;
+}
+
+
+float Texture::getAspectRatio() {
+    return float(width) / height;
 }
 
 

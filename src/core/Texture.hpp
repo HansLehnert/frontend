@@ -10,28 +10,31 @@ public:
     Texture();
     ~Texture();
 
-    /**
-     * @brief Load texture from raw data.
-     */
+    // Load texture from raw data.
     static std::shared_ptr<Texture> fromData(
-        const unsigned char* data,
+        const void* data,
         unsigned int width,
         unsigned int height,
         GLuint filter = GL_LINEAR,
         GLenum format = GL_RGBA,
-        GLenum type = GL_UNSIGNED_INT
+        GLenum type = GL_UNSIGNED_BYTE
     );
 
-    /**
-     * @brief Read texture data from file.
-     */
+    // Read texture data from file.
     static std::shared_ptr<Texture> fromFile(
         std::string filename, GLuint filter = GL_LINEAR);
 
-
-    int getWidth();
-    int getHeight();
+    // Get the openGL id for the texture
     GLuint getId();
+
+    // Get the texture width in pixels
+    int getWidth();
+
+    // Gen the texture height in pixels
+    int getHeight();
+
+    // Get the aspect ratio of the image as width / height
+    float getAspectRatio();
 
 private:
     GLuint id;
@@ -40,7 +43,7 @@ private:
     unsigned int height;
 
     void bufferData(
-        const unsigned char* data,
+        const void* data,
         GLuint filter,
         GLenum format,
         GLenum type
