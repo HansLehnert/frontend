@@ -9,7 +9,7 @@
 #include "glm/glm.hpp"
 
 
-class Object : public std::enable_shared_from_this<Object> {
+class Object {
 public:
     Object(std::string name);
     Object(const Object& obj);
@@ -28,6 +28,6 @@ public:
 protected:
     std::string instance_name;
 
-    std::weak_ptr<Object> parent;
+    Object* parent;
     std::vector<std::shared_ptr<Object>> children;
 };

@@ -41,11 +41,10 @@ void GraphicObject::step() {
     // Compute the transformation matrix using parent model matrix
     model_matrix = computeModelMatrix();
 
-    if (!parent.expired()) {
-        std::shared_ptr<GraphicObject> graphic_parent =
-            std::dynamic_pointer_cast<GraphicObject>(parent.lock());
+    if (parent != nullptr) {
+        GraphicObject* graphic_parent = dynamic_cast<GraphicObject*>(parent);
 
-        if (graphic_parent) {
+        if (graphic_parent != nullptr) {
             model_matrix = graphic_parent->model_matrix * model_matrix;
         }
     }

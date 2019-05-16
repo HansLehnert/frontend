@@ -1,6 +1,5 @@
 #include "core/Object.hpp"
 
-#include <iostream>
 #include <algorithm>
 
 #include <list>
@@ -9,6 +8,7 @@
 
 Object::Object(std::string instance_name) {
     this->instance_name = instance_name;
+    parent = nullptr;
 }
 
 
@@ -26,9 +26,7 @@ Object& Object::operator=(const Object& obj) {
 
 Object::~Object() {
     for (std::shared_ptr<Object>& child : children) {
-        if (child != nullptr) {
-            child->parent = std::weak_ptr<Object>();
-        }
+        child->parent = nullptr;
     }
 }
 
@@ -43,7 +41,7 @@ void Object::step() {
 
 
 void Object::addChild(std::shared_ptr<Object> child) {
-    // Check wether the object is already a child
+    // Check whether the object is already a child
     for (std::shared_ptr<Object>& c : children) {
         if (child == c) {
             return;
@@ -51,20 +49,19 @@ void Object::addChild(std::shared_ptr<Object> child) {
     }
 
     // Remove old parent from child
-    std::shared_ptr<Object> old_parent = child->parent.lock();
-    if (old_parent) {
-        old_parent->removeChild(child);
+    if (child->parent != nullptr) {
+        child->parent->removeChild(child);
     }
 
     children.push_back(child);
-    child->parent = std::weak_ptr<Object>(shared_from_this());
+    child->parent = this;
 }
 
 
 void Object::removeChild(std::shared_ptr<Object> child) {
     for (auto i = children.begin(); i != children.end(); i++) {
         if (*i == child) {
-            child->parent = std::weak_ptr<Object>();
+            child->parent = nullptr;
             children.erase(i);
             break;
         }
@@ -75,7 +72,7 @@ void Object::removeChild(std::shared_ptr<Object> child) {
 void Object::removeChild(std::string child_name) {
     for (auto i = children.begin(); i != children.end(); i++) {
         if ((*i)->instance_name == child_name) {
-            (*i)->parent = std::weak_ptr<Object>();
+            (*i)->parent = nullptr;
             children.erase(i);
             break;
         }
