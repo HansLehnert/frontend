@@ -1,27 +1,28 @@
 //#version 100
 
 attribute vec4 position;
+attribute vec2 uv;
 
 varying vec2 mask_uv;
+varying vec2 previous_uv;
 varying vec2 current_uv;
-varying vec2 next_uv;
 
 uniform mat4 world_matrix;
 uniform mat4 model_matrix;
 
-uniform float current_aspect;
-uniform float next_aspect;
+uniform float progress;
+
+uniform float previous_aspect_ratio;
+uniform float current_aspect_ratio;
 
 void main() {
-	//gl_Position = position;
 	gl_Position = world_matrix * model_matrix * position;
 
-	mask_uv.x = position.x <= 0.0 ? 0.0 : 1.0;
-	mask_uv.y = position.y <= 0.0 ? 1.0 : 0.0;
+	mask_uv = uv;
 
-	current_uv.x = mask_uv.x;
-	current_uv.y = (mask_uv.y - 0.5) * current_aspect + 0.5;
+	previous_uv = uv;
+	previous_uv.y = (previous_uv.y - 0.5) / previous_aspect_ratio + 0.5;
 
-	next_uv.x = mask_uv.x;
-	next_uv.y = (mask_uv.y - 0.5) * next_aspect + 0.5;
+	current_uv = uv;
+	current_uv.y = (current_uv.y - 0.5) / current_aspect_ratio + 0.5;
 }
