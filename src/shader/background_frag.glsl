@@ -2,11 +2,11 @@
 
 varying vec3 position;
 
-uniform vec3 bg_color;
+uniform vec3 background_color;
+uniform vec3 accent_color;
 
 void main() {
-	vec3 back_color = bg_color * 0.1;
-	vec3 front_color = pow(bg_color, vec3(0.1));//vec3(0.3) + bg_color * 0.5;
-	gl_FragColor.xyz = mix(front_color, back_color, sqrt(position.z));
-	gl_FragColor.w = 1.0;
+	gl_FragColor.rgb = mix(
+		accent_color, background_color, clamp(position.z, 0., 1.));
+	gl_FragColor.a = 1.0;
 }
