@@ -22,20 +22,20 @@ endif ()
 
 # GL libraries
 if (UNIX)
-find_library(GL_LIBRARY GL)
-link_libraries(${GL_LIBRARY})
+	find_library(GL_LIBRARY GL)
+	link_libraries(${GL_LIBRARY})
 endif ()
 else ()
-# Add raspberry specific GLES libraries here
+	# Add raspberry specific GLES libraries here
 endif ()
 
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIR_freetype2})
 if (FREETYPE_LIBRARY_DEBUG)
-link_libraries(optimized ${FREETYPE_LIBRARY_RELEASE})
-link_libraries(debug ${FREETYPE_LIBRARY_DEBUG})
+	link_libraries(optimized ${FREETYPE_LIBRARY_RELEASE})
+	link_libraries(debug ${FREETYPE_LIBRARY_DEBUG})
 else ()
-link_libraries(${FREETYPE_LIBRARY_RELEASE})
+	link_libraries(${FREETYPE_LIBRARY_RELEASE})
 endif ()
 
 find_package(CURL REQUIRED)
@@ -49,6 +49,10 @@ link_libraries(${SDL2_LIBRARY})
 find_package(SDL2_image REQUIRED)
 include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 link_libraries(${SDL2_IMAGE_LIBRARY})
+
+add_subdirectory("external")
+
+link_libraries(pugixml)
 
 # C++ sources
 file(GLOB SOURCES "src/*.cpp" "src/*/*.cpp")
