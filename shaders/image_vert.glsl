@@ -1,6 +1,7 @@
 //#version 100
 
 attribute vec4 position;
+attribute vec2 uv;
 
 varying vec2 vertex_uv;
 
@@ -11,5 +12,5 @@ void main() {
 	//gl_Position = position;
 	gl_Position = world_matrix * model_matrix * position;
 
-	vertex_uv = position.xy;
+	vertex_uv = uv;
 }
