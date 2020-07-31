@@ -35,7 +35,7 @@ Marquee::Marquee(
 }
 
 
-void Marquee::update() {
+void Marquee::updateSelf() {
     if (transition_progress < transition_steps) {
         transition_progress++;
     }
@@ -133,7 +133,7 @@ std::shared_ptr<Texture> Marquee::makeTransitionMask(
     }
 
     // Normalize
-    for (int i = 0; i < bitmap.size() / 3; i++) {
+    for (unsigned int i = 0; i < bitmap.size() / 3; i++) {
         bitmap[3 * i] = (bitmap[3 * i] - min_val) / (max_val - min_val);
     }
 

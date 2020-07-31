@@ -4,9 +4,9 @@
 #include <SDL2/SDL.h>
 #include "core/Object.hpp"
 
-class Context : public Object {
+class Context {
 public:
-    Context(std::string = "context");
+    Context();
     ~Context();
 
     bool init();

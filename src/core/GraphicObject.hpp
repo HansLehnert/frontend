@@ -1,5 +1,6 @@
 #pragma once
 
+#include "glm/glm.hpp"
 #include "core/Object.hpp"
 #include "core/Program.hpp"
 
@@ -7,14 +8,15 @@
 class GraphicObject : public Object {
 public:
     GraphicObject(std::string instance_name);
-    GraphicObject(GraphicObject& obj);
+    GraphicObject(GraphicObject& obj) = delete;
 
     ~GraphicObject();
 
-    //GraphicObject& operator=(GraphicObject& obj);
 
-    virtual void step();
-    virtual void render() {};
+    void update() override final;
+    virtual void render() = 0;
+
+    const GraphicObject* parent() const { return dynamic_cast<const GraphicObject*>(Object::parent()); }
 
     bool visible;
     static glm::mat4 world_matrix;
@@ -33,10 +35,9 @@ public:
     glm::vec3 scale;
 
 protected:
+    glm::mat4 computeModelMatrix();
+
     Program* program;
 
     glm::mat4 model_matrix;
-
-private:
-    glm::mat4 computeModelMatrix();
 };

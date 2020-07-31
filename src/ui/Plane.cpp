@@ -33,7 +33,7 @@ Plane::Plane(std::string instance_name) :
         // Generate vertex data for each origin position
         std::array<Vertex, base_vertex_data.size() * 9> vertex_data;
         for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < base_vertex_data.size(); j++) {
+            for (unsigned int j = 0; j < base_vertex_data.size(); j++) {
                 int index = base_vertex_data.size() * i + j;
                 vertex_data[index] = base_vertex_data[j];
                 vertex_data[index].x -= 0.5 * (i % 3);
@@ -65,12 +65,14 @@ void Plane::render() {
         program->uniformLocation("model_matrix"),
         1,
         GL_FALSE,
-        (float*)&model_matrix);
+        (GLfloat*)&model_matrix
+    );
     glUniformMatrix4fv(
         program->uniformLocation("world_matrix"),
         1,
         GL_FALSE,
-        (float*)&world_matrix);
+        (GLfloat*)&world_matrix
+    );
 
     glDrawArrays(GL_TRIANGLE_FAN, base_vertex_data.size() * (int)origin, 4);
 }

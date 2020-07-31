@@ -12,7 +12,7 @@ public:
         std::string instance_name = ""
     );
 
-    void update();
+    void updateSelf() override;
     void render();
 
     // Start the transition to a new image or enqueue an image to transition to

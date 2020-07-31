@@ -1,5 +1,5 @@
-/*
- * PLane graphical object
+/**
+ * Plane graphical object
  *
  * To be used as base class for objects that are drawn as rectangles
  */

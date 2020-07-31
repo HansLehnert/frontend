@@ -17,7 +17,7 @@
 int Context::sdl_init = 0;
 
 
-Context::Context(std::string instance_name) : Object(instance_name) {
+Context::Context() {
     running = false;
 
     joystick_axis = {0};
@@ -101,7 +101,7 @@ bool Context::init() {
 #endif
 
     //GL configuration
-    glClearColor(1, 0, 0, 0);
+    glClearColor(0, 0, 0, 0);
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
@@ -117,6 +117,7 @@ bool Context::init() {
 
     // Vertex attributes
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     //Initialize joystick
     int joystick_count = SDL_NumJoysticks();
@@ -286,7 +287,6 @@ void Context::dispatchEvent(InputEvent& event) {
 
 void Context::swapBuffers() {
     SDL_GL_SwapWindow(window);
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

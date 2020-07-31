@@ -2,32 +2,39 @@
 
 #include <string>
 #include <vector>
-#include <list>
-#include <memory>
-
-#include <SDL2/SDL.h>
-#include "glm/glm.hpp"
 
 
 class Object {
 public:
-    Object(std::string name);
-    Object(const Object& obj);
+    Object(const std::string& name);
+    Object(const Object& obj) = delete;
     ~Object();
 
-    Object& operator=(const Object& obj);
 
-    virtual void step();
-    virtual void update() {};
+    const std::string& name() const { return name_; }
+    Object* parent() const { return parent_; }
+    const std::vector<Object*>& children() const { return children_; }
 
-    void addChild(std::shared_ptr<Object> child);
-    void removeChild(std::shared_ptr<Object> child);
-    void removeChild(std::string child_name);
-    std::shared_ptr<Object> getChild(std::string child_name);
+    // Update own and children state recursively
+    virtual void update();
 
-protected:
-    std::string instance_name;
+    // Update self state
+    virtual void updateSelf() {};
 
-    Object* parent;
-    std::vector<std::shared_ptr<Object>> children;
+    // Add object as child and remove from previous parent if needed
+    void addChild(Object& child);
+
+    // Remove child from object and return pointer to the child
+    bool removeChild(Object& child);
+    bool removeChild(const std::string& child_name);
+
+    void removeFromParent();
+
+    // Searches children object using their instance name
+    Object& getChild(const std::string& child_name);
+
+private:
+    std::string name_;
+    Object* parent_;
+    std::vector<Object*> children_;
 };

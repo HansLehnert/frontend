@@ -11,8 +11,8 @@ class Background : public GraphicObject {
 public:
     Background(std::string = "");
 
-    virtual void render();
-    virtual void update();
+    void updateSelf() override;
+    void render();
 
     /**
      * @brief Adjust the size to fit the size of the screen space

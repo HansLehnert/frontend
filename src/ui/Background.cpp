@@ -59,7 +59,7 @@ void Background::render() {
 }
 
 
-void Background::update() {
+void Background::updateSelf() {
     time++;
     scroll_offset.x = 2 * spacing.x * sin(time * 0.02);
     scroll_offset.y = 2 * spacing.y * cos(time * 0.02);

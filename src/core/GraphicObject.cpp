@@ -1,6 +1,9 @@
 #include "core/GraphicObject.hpp"
 
 
+#include <memory>
+
+
 glm::mat4 GraphicObject::world_matrix(1);
 
 
@@ -35,18 +38,14 @@ GraphicObject::~GraphicObject() {
 // }
 
 
-void GraphicObject::step() {
-    update();
+void GraphicObject::update() {
+    updateSelf();
 
     // Compute the transformation matrix using parent model matrix
     model_matrix = computeModelMatrix();
 
-    if (parent != nullptr) {
-        GraphicObject* graphic_parent = dynamic_cast<GraphicObject*>(parent);
-
-        if (graphic_parent != nullptr) {
-            model_matrix = graphic_parent->model_matrix * model_matrix;
-        }
+    if (parent() != nullptr) {
+        model_matrix = parent()->model_matrix * model_matrix;
     }
 
 	if (visible && program != nullptr) {
@@ -54,8 +53,8 @@ void GraphicObject::step() {
     	render();
 	}
 
-    for (std::shared_ptr<Object>& child : children) {
-        child->step();
+    for (const auto& child : children()) {
+        child->update();
     }
 }
 
