@@ -5,13 +5,10 @@
 #include "glm/glm.hpp"
 #include "core/Texture.hpp"
 #include "core/Program.hpp"
+#include "gfx/Mesh.hpp"
 
 
 // Model data
-struct Vertex {
-    float x, y, z, w, u, v;
-};
-
 const std::array<Vertex, 5> base_vertex_data = {
     0, 0, 0, 1, 0, 0,
     1, 0, 0, 1, 1, 0,
@@ -21,15 +18,15 @@ const std::array<Vertex, 5> base_vertex_data = {
 };
 
 
-GLuint Plane::model_buffer = 0;
+Mesh Plane::mesh_;
 
 
 Plane::Plane(std::string instance_name) :
         GraphicObject(instance_name),
-        origin(Plane::Origin::TOP_LEFT)
+        origin_(Plane::Origin::TOP_LEFT)
 {
     // Initialize the quad model buffer for rendering the image
-    if (model_buffer == 0) {
+    if (!mesh_.hasVertexData()) {
         // Generate vertex data for each origin position
         std::array<Vertex, base_vertex_data.size() * 9> vertex_data;
         for (int i = 0; i < 9; i++) {
@@ -41,14 +38,7 @@ Plane::Plane(std::string instance_name) :
             }
         }
 
-        glGenBuffers(1, &model_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
-        glBufferData(
-            GL_ARRAY_BUFFER,
-            sizeof(vertex_data),
-            vertex_data.data(),
-            GL_STATIC_DRAW
-        );
+        mesh_.loadVertexData(vertex_data);
     }
 
     program = Program::getProgram("image");
@@ -56,11 +46,6 @@ Plane::Plane(std::string instance_name) :
 
 
 void Plane::render() {
-    glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
-	glVertexAttribPointer(
-        1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));
-
     glUniformMatrix4fv(
         program->uniformLocation("model_matrix"),
         1,
@@ -74,5 +59,6 @@ void Plane::render() {
         (GLfloat*)&world_matrix
     );
 
-    glDrawArrays(GL_TRIANGLE_FAN, base_vertex_data.size() * (int)origin, 4);
+    uint64_t vertex_start = base_vertex_data.size() * static_cast<int>(origin_);
+    mesh_.render(vertex_start, 4, GL_TRIANGLE_FAN);
 }
