@@ -136,7 +136,6 @@ std::shared_ptr<Texture> renderText(std::string text) {
         }
 
         // Copy glyph to the texture bitmap
-        int k = 0;
         for (unsigned int i = 0; i < bitmap_glyph->bitmap.rows; i++) {
             for (unsigned int j = 0; j < bitmap_glyph->bitmap.width; j++) {
                 unsigned int dst_index = 3 + 4 * (j

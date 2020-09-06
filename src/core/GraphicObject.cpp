@@ -8,12 +8,8 @@ glm::mat4 GraphicObject::world_matrix(1);
 
 
 GraphicObject::GraphicObject(std::string instance_name) :
-    Object(instance_name)
+    Object(instance_name), visible_(true), position_(0), scale_(1)
 {
-    visible = true;
-    position = glm::vec3(0);
-    scale = glm::vec3(1);
-
     computeModelMatrix();
 }
 
@@ -42,14 +38,14 @@ void GraphicObject::update() {
     updateSelf();
 
     // Compute the transformation matrix using parent model matrix
-    model_matrix = computeModelMatrix();
+    model_matrix_ = computeModelMatrix();
 
     if (parent() != nullptr) {
-        model_matrix = parent()->model_matrix * model_matrix;
+        model_matrix_ = parent()->model_matrix_ * model_matrix_;
     }
 
-	if (visible && program != nullptr) {
-        glUseProgram(program->getId());
+	if (visible_ && program_ != nullptr) {
+        program_->bind();
     	render();
 	}
 
@@ -63,14 +59,14 @@ glm::mat4 GraphicObject::computeModelMatrix() {
 	glm::mat4 matrix = glm::mat4(1);
 
 	// Position
-	matrix[3][0] = x;
-	matrix[3][1] = y;
-	matrix[3][2] = z;
+	matrix[3][0] = position_.x;
+	matrix[3][1] = position_.y;
+	matrix[3][2] = position_.z;
 
     // Scale
-    matrix[0][0] = scale.x;
-    matrix[1][1] = scale.y;
-    matrix[2][2] = scale.z;
+    matrix[0][0] = scale_.x;
+    matrix[1][1] = scale_.y;
+    matrix[2][2] = scale_.z;
 
 	return matrix;
 }

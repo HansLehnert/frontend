@@ -7,37 +7,33 @@
 
 class GraphicObject : public Object {
 public:
-    GraphicObject(std::string instance_name);
-    GraphicObject(GraphicObject& obj) = delete;
+    // Update and render self and child objects
+    void update() override final;
 
+protected:
+    GraphicObject(std::string instance_name);
+    GraphicObject(GraphicObject&&) = default;
     ~GraphicObject();
 
+    // Used to implement the actual drawing routine
+    virtual void render() const = 0;
 
-    void update() override final;
-    virtual void render() = 0;
+    Program& program() const { return *program_; } // TODO: should also be set with setter
 
-    const GraphicObject* parent() const { return dynamic_cast<const GraphicObject*>(Object::parent()); }
+    const GraphicObject* parent() const {
+        return dynamic_cast<const GraphicObject*>(Object::parent());
+    }
 
-    bool visible;
+public:
     static glm::mat4 world_matrix;
 
-    // Position
-    union {
-        glm::vec3 position;
-        struct {
-            float x;
-            float y;
-            float z;
-        };
-    };
-
-    // Scale
-    glm::vec3 scale;
+    bool visible_;
+    glm::vec3 position_;
+    glm::vec3 scale_;
 
 protected:
     glm::mat4 computeModelMatrix();
+    glm::mat4 model_matrix_;
 
-    Program* program;
-
-    glm::mat4 model_matrix;
+    Program* program_;
 };

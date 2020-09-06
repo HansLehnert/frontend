@@ -1,31 +1,29 @@
 #include "ui/Label.hpp"
 
 
-Label::Label(std::string label_text, std::string instance_name) :
-        Image(nullptr, instance_name)
+Label::Label(std::string text, std::string instance_name) :
+        Image(nullptr, instance_name),
+        line_height_(0.1)
 {
-    if (instance_name == "") {
-        instance_name = "label_" + label_text;
-    }
-
-    setText(label_text);
+    fill_mode_ = Image::FillMode::Fit;
+    setText(text);
 }
 
 
 void Label::setText(std::string text) {
-    this->text = text;
+    text_ = text;
 
-    texture = renderText(text);
-    scale.x = scale.y / texture->getHeight() * texture->getWidth();
-}
-
-
-std::string Label::getText() {
-    return text;
+    setTexture(renderText(text));
+    setLineHeight(line_height_);  // Resize the label to keep current line height
 }
 
 
 void Label::setLineHeight(float line_height) {
-    scale.y = line_height;
-    scale.x = line_height / texture->getHeight() * texture->getWidth();
+    line_height_ = line_height;
+    resizeToLineHeight();
+}
+
+
+void Label::resizeToLineHeight() {
+    setSize(glm::vec2(line_height_ * texture().aspectRatio(), line_height_));
 }

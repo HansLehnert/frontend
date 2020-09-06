@@ -60,8 +60,8 @@ std::shared_ptr<Texture> Texture::fromData(
 ) {
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
-    texture->width = width;
-    texture->height = height;
+    texture->width_ = width;
+    texture->height_ = height;
     texture->bufferData(data, filter, format, type);
 
     return texture;
@@ -82,34 +82,10 @@ void Texture::bufferData(
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
     glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RGBA,
-        width,
-        height,
-        0,
-        format,
-        type,
-        data
-    );
+        GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, format, type, data);
 }
 
 
-GLuint Texture::getId() {
+GLuint Texture::getId() const {
     return id;
-}
-
-
-int Texture::getWidth() {
-    return width;
-}
-
-
-float Texture::getAspectRatio() {
-    return float(width) / height;
-}
-
-
-int Texture::getHeight() {
-    return height;
 }

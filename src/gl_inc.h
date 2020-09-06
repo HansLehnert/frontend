@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef RASPBERRY_PI
 
 #include <EGL/egl.h>

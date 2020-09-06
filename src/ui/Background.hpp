@@ -11,8 +11,7 @@ class Background : public GraphicObject {
 public:
     Background(std::string = "");
 
-    void updateSelf() override;
-    void render();
+    void render() const override;
 
     /**
      * @brief Adjust the size to fit the size of the screen space
@@ -25,6 +24,9 @@ public:
     glm::vec3 accent_color;
 
     glm::vec3 scroll_offset;
+
+protected:
+    void updateSelf() override;
 
 private:
     int time;

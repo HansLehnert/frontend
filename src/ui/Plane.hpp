@@ -1,8 +1,3 @@
-/**
- * Plane graphical object
- *
- * To be used as base class for objects that are drawn as rectangles
- */
 
 #pragma once
 
@@ -16,8 +11,10 @@
 #include "glm/glm.hpp"
 
 
+// Plane graphic object, to be used for rectangular objects
 class Plane: public GraphicObject {
 public:
+    // Describes the transformation origin of the plane object when rendered
     enum class Origin {
         TOP_LEFT,
         TOP,
@@ -32,18 +29,20 @@ public:
 
     Plane(std::string name = "");
 
-    void render() override;
-
+    // Can be overriden by derived objects that need to resize their children
     const glm::vec2& size() const { return size_; }
-    void setSize(glm::vec2 size);
+    virtual void setSize(glm::vec2 size) { size_ = size; }
 
     Origin origin() const { return origin_; }
     void setOrigin(Origin origin) { origin_ = origin; }
 
 protected:
-    static Mesh mesh_;
+    void draw(bool fill) const;
+
+    const Mesh& mesh() { return mesh_; }
 
 private:
     Origin origin_;
     glm::vec2 size_;
+    static Mesh mesh_;
 };

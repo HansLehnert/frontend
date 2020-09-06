@@ -6,26 +6,19 @@
 // Text label object. Render a single line of text.
 class Label : public Image {
 public:
-    /**
-     * @brief Construct a new Label object
-     */
-    Label(std::string label_text = "", std::string instance_name = "");
+    Label() : Label("", "") {}
+    Label(std::string label_text, std::string instance_name);
 
-    /**
-     * @brief Set the text value of the label
-     */
+    // The text displayed on the label. Changing it genereates a new texture
+    const std::string text() const { return text_; };
     void setText(std::string text);
 
-    /**
-     * @brief Get the text value
-     */
-    std::string getText();
-
-    /**
-     * @brief Set the vertical size of the label
-     */
+    // Fixes the height of the plane that draws the label
     void setLineHeight(float line_height);
 
 private:
-    std::string text;
+    void resizeToLineHeight();
+
+    std::string text_;
+    float line_height_;
 };

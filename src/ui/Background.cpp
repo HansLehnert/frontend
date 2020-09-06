@@ -16,32 +16,32 @@ Background::Background(std::string instance_name) :
     fit(1, 1, 1);
 
     // Load program
-    program = Program::getProgram("background");
-    background_color_loc = program->uniformLocation("background_color");
-    accent_color_loc = program->uniformLocation("accent_color");
-    offset_loc = program->uniformLocation("offset");
+    program_ = Program::getProgram("background");
+    background_color_loc = program().uniformLocation("background_color");
+    accent_color_loc = program().uniformLocation("accent_color");
+    offset_loc = program().uniformLocation("offset");
 }
 
 
-void Background::render() {
+void Background::render() const {
     glDepthMask(GL_FALSE);
 
     glBindBuffer(GL_ARRAY_BUFFER, model_buffer);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
-    glUseProgram(program->getId());
+    program().bind();
 
     glUniformMatrix4fv(
-        program->uniformLocation("world_matrix"),
+        program().uniformLocation("world_matrix"),
         1,
         GL_FALSE,
         (GLfloat*)&world_matrix
     );
     glUniformMatrix4fv(
-        program->uniformLocation("model_matrix"),
+        program().uniformLocation("model_matrix"),
         1,
         GL_FALSE,
-        (GLfloat*)&model_matrix
+        (GLfloat*)&model_matrix_
     );
     glUniform3fv(background_color_loc, 1, (GLfloat*)&background_color);
 
@@ -74,8 +74,8 @@ void Background::updateSelf() {
 
 
 void Background::fit(float width, float height, float grid_spacing) {
-    scale.x = width;
-    scale.y = height;
+    scale_.x = width;
+    scale_.y = height;
 
     spacing.x = grid_spacing / width;
     spacing.y = grid_spacing / height;

@@ -23,7 +23,8 @@ Mesh Plane::mesh_;
 
 Plane::Plane(std::string instance_name) :
         GraphicObject(instance_name),
-        origin_(Plane::Origin::TOP_LEFT)
+        origin_(Plane::Origin::TOP_LEFT),
+        size_(1)
 {
     // Initialize the quad model buffer for rendering the image
     if (!mesh_.hasVertexData()) {
@@ -41,24 +42,33 @@ Plane::Plane(std::string instance_name) :
         mesh_.loadVertexData(vertex_data);
     }
 
-    program = Program::getProgram("image");
+    program_ = Program::getProgram("image");
 };
 
 
-void Plane::render() {
+void Plane::draw(bool fill) const {
     glUniformMatrix4fv(
-        program->uniformLocation("model_matrix"),
+        program().uniformLocation("model_matrix"),
         1,
         GL_FALSE,
-        (GLfloat*)&model_matrix
+        reinterpret_cast<const GLfloat*>(&model_matrix_)
     );
     glUniformMatrix4fv(
-        program->uniformLocation("world_matrix"),
+        program().uniformLocation("world_matrix"),
         1,
         GL_FALSE,
-        (GLfloat*)&world_matrix
+        reinterpret_cast<const GLfloat*>(&world_matrix)
+    );
+    glUniform2fv(
+        program().uniformLocation("plane_size"),
+        1,
+        reinterpret_cast<const GLfloat*>(&size_)
     );
 
-    uint64_t vertex_start = base_vertex_data.size() * static_cast<int>(origin_);
-    mesh_.render(vertex_start, 4, GL_TRIANGLE_FAN);
+    const uint64_t vertex_start = base_vertex_data.size() * static_cast<int>(origin_);
+
+    if (fill)
+        mesh_.render(vertex_start, 4, GL_TRIANGLE_FAN);
+    else
+        mesh_.render(vertex_start, 5, GL_LINE_STRIP);
 }

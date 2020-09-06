@@ -22,7 +22,7 @@ public:
     template<typename T>
     void loadVertexData(const T& data);
 
-    void render(int64_t start_index, uint64_t count, GLuint draw_mode) const;
+    void render(uint64_t start_index, uint64_t count, GLuint draw_mode) const;
 
 private:
     size_t loadData(GLuint& buffer, const Vertex* data, size_t count);

@@ -12,23 +12,23 @@ public:
         std::string instance_name = ""
     );
 
-    void updateSelf() override;
-    void render();
+    void render() const override;
 
     // Start the transition to a new image or enqueue an image to transition to
     void updateImage(std::shared_ptr<Texture> next_image);
 
-    // Resize the marquee
-    // Use instead of the scale member to properly resize the transition
-    // animation
-    void setSize(float width, float height);
+    void setSize(glm::vec2 size) override;
 
-    unsigned int transition_progress;
-    unsigned int transition_steps;
 
     std::shared_ptr<Texture> makeTransitionMask(int width, int height);
 
+protected:
+    void updateSelf() override;
+
 private:
+    unsigned int transition_progress;
+    unsigned int transition_steps;
+
     GLuint model_buffer;
 
     // Uniform location

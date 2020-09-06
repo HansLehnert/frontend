@@ -10,15 +10,22 @@
 
 class Image: public Plane {
 public:
+    enum class FillMode {
+        Fit,
+        Stretch,
+    };
+
     Image(std::shared_ptr<Texture> texture, std::string instance_name = "");
 
-    virtual void render();
+    virtual void render() const;
 
-    // Scale the image size to fit a bounding box, while preserving the aspect
-    // ratio of the texture
-    void fitBounds(float max_width, float max_height);
+    const Texture& texture() const { return *texture_; }
+    void setTexture(std::shared_ptr<Texture> texture) { texture_ = texture; }
 
-    std::shared_ptr<Texture> texture;
-    glm::vec4 tint;
-    float opacity;
+    FillMode  fill_mode_;
+    glm::vec4 tint_color_;
+    float     opacity_;
+
+private:
+    std::shared_ptr<Texture> texture_;
 };

@@ -10,7 +10,7 @@ Marquee::Marquee(
 ) :
         Plane(instance_name)
 {
-    program = Program::getProgram("marquee");
+    program_ = Program::getProgram("marquee");
 
     // Generate initial textures
     transition_mask = makeTransitionMask(PIXEL_DENSITY, PIXEL_DENSITY);
@@ -20,14 +20,14 @@ Marquee::Marquee(
     next_texture = initial_texture;
 
     // Store uniform locations for faster lookup
-    uniform_previous_aspect_ratio = program->uniformLocation(
+    uniform_previous_aspect_ratio = program().uniformLocation(
         "previous_aspect_ratio");
-    uniform_current_aspect_ratio = program->uniformLocation(
+    uniform_current_aspect_ratio = program().uniformLocation(
         "current_aspect_ratio");
-    uniform_progress = program->uniformLocation("progress");
-    uniform_previous_image = program->uniformLocation("previous_image");
-    uniform_current_image = program->uniformLocation("current_image");
-    uniform_mask_image = program->uniformLocation("mask_image");
+    uniform_progress = program().uniformLocation("progress");
+    uniform_previous_image = program().uniformLocation("previous_image");
+    uniform_current_image = program().uniformLocation("current_image");
+    uniform_mask_image = program().uniformLocation("mask_image");
 
     // Transition variables
     transition_steps = 20;
@@ -50,7 +50,7 @@ void Marquee::updateSelf() {
 }
 
 
-void Marquee::render() {
+void Marquee::render() const {
     glUniform1i(uniform_mask_image, 2);
     glUniform1i(uniform_previous_image, 0);
     glUniform1i(uniform_current_image, 1);
@@ -58,9 +58,9 @@ void Marquee::render() {
         uniform_progress, (float)transition_progress / transition_steps);
 
     glUniform1f(
-        uniform_previous_aspect_ratio, previous_texture->getAspectRatio());
+        uniform_previous_aspect_ratio, previous_texture->aspectRatio());
     glUniform1f(
-        uniform_current_aspect_ratio, current_texture->getAspectRatio());
+        uniform_current_aspect_ratio, current_texture->aspectRatio());
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, previous_texture->getId());
@@ -69,7 +69,7 @@ void Marquee::render() {
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, transition_mask->getId());
 
-    Plane::render();
+    Plane::draw(true);
 }
 
 
@@ -78,11 +78,9 @@ void Marquee::updateImage(std::shared_ptr<Texture> next_image) {
 }
 
 
-void Marquee::setSize(float width, float height) {
-    scale.x = width;
-    scale.y = height;
-    transition_mask = makeTransitionMask(
-        PIXEL_DENSITY * width, PIXEL_DENSITY * height);
+void Marquee::setSize(glm::vec2 size) {
+    Plane::setSize(size);
+    transition_mask = makeTransitionMask(PIXEL_DENSITY * size.x, PIXEL_DENSITY * size.y);
 }
 
 

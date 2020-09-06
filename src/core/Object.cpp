@@ -31,6 +31,7 @@ void Object::addChild(Object& child) {
 
     children_.push_back(&child);
     child.parent_ = this;
+    newChild(child);
 }
 
 
@@ -45,6 +46,7 @@ bool Object::removeChild(Object& child) {
             return true;
         }
     }
+    return false;
 }
 
 
@@ -72,7 +74,7 @@ void Object::removeFromParent() {
 }
 
 
-Object& Object::getChild(const std::string& child_name) {
+Object& Object::findChild(const std::string& child_name) {
     for (auto& child : children_) {
         if (child->name_ == child_name) {
             return *child;

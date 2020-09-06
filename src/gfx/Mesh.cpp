@@ -1,6 +1,7 @@
 #include "Mesh.hpp"
 
 #include "gl_inc.h"
+#include "Exceptions.hpp"
 
 
 Mesh::~Mesh() {
@@ -11,7 +12,10 @@ Mesh::~Mesh() {
 }
 
 
-void Mesh::render(int64_t start_index, uint64_t count, GLuint draw_mode) const {
+void Mesh::render(uint64_t start_index, uint64_t count, GLuint draw_mode) const {
+    if (start_index >= vertex_count_ || (start_index + count) >= vertex_count_)
+        throw VertexIndexOutOfRange(start_index, count, vertex_count_);
+
     glBindBuffer(GL_ARRAY_BUFFER, model_buffer_);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));

@@ -6,28 +6,30 @@
 #include "core/Program.hpp"
 
 
-Image::Image(std::shared_ptr<Texture> texture, std::string instance_name) :
-        Plane(instance_name),
-        texture(texture),
-        opacity(1),
-        tint(0)
+Image::Image(std::shared_ptr<Texture> texture, std::string name) :
+        Plane(name),
+        fill_mode_(Image::FillMode::Fit),
+        tint_color_(0),
+        opacity_(1),
+        texture_(texture)
 {
-    program = Program::getProgram("image");
+    program_ = Program::getProgram("image");
 };
 
 
-void Image::render() {
-    glUniform4fv(program->uniformLocation("tint"), 1, (float*)&tint);
-    glUniform1f(program->uniformLocation("opacity"), opacity);
+void Image::render() const {
+    glUniform4fv(program().uniformLocation("tint"), 1, (float*)&tint_color_);
+    glUniform1f(program().uniformLocation("opacity"), opacity_);
 
-    glUniform1i(program->uniformLocation("image"), 0);
+    glUniform1i(program().uniformLocation("image"), 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture->getId());
+    glBindTexture(GL_TEXTURE_2D, texture_->getId());
 
-    Plane::render();
+    Plane::draw(true);
 }
 
 
+/*
 void Image::fitBounds(float max_width, float max_height) {
     float bounds_ratio = max_width / max_height;
     float texture_ratio = (float)texture->getWidth() / texture->getHeight();
@@ -40,4 +42,4 @@ void Image::fitBounds(float max_width, float max_height) {
         scale.x = max_height * texture_ratio;
         scale.y = max_height;
     }
-}
+}*/

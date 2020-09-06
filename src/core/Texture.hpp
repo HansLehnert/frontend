@@ -25,27 +25,20 @@ public:
         std::string filename, GLuint filter = GL_LINEAR);
 
     // Get the openGL id for the texture
-    GLuint getId();
+    GLuint getId() const;
 
     // Get the texture width in pixels
-    int getWidth();
-
-    // Gen the texture height in pixels
-    int getHeight();
+    int width() const { return width_; }
+    int height() const { return height_; };
 
     // Get the aspect ratio of the image as width / height
-    float getAspectRatio();
+    float aspectRatio() const { return static_cast<float>(width_) / height_; }
 
 private:
     GLuint id;
 
-    unsigned int width;
-    unsigned int height;
+    uint64_t width_;
+    uint64_t height_;
 
-    void bufferData(
-        const void* data,
-        GLuint filter,
-        GLenum format,
-        GLenum type
-    );
+    void bufferData(const void* data, GLuint filter, GLenum format, GLenum type);
 };
