@@ -10,19 +10,34 @@ Object::Object(const std::string& instance_name) :
 }
 
 
-Object::~Object() {
-    for (auto& child : children_) {
-        child->parent_ = nullptr;
+Object::Object(Object&& object) noexcept : parent_(nullptr) {
+    name_ = std::move(object.name_);
+
+    children_ = std::move(object.children_);
+    for (auto child : children_)
+        child->parent_ = this;
+
+    parent_ = nullptr;
+    if (object.parent_ != nullptr) {
+        Object* parent = object.parent_;
+        parent->removeChild(object);
+        parent->addChild(*this);
     }
+}
+
+
+Object::~Object() {
+    removeFromParent();
+    for (auto& child : children_)
+        child->parent_ = nullptr;
 }
 
 
 void Object::update() {
     updateSelf();
 
-    for (auto& child : children_) {
+    for (auto& child : children_)
         child->update();
-    }
 }
 
 
@@ -31,7 +46,6 @@ void Object::addChild(Object& child) {
 
     children_.push_back(&child);
     child.parent_ = this;
-    newChild(child);
 }
 
 

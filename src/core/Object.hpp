@@ -7,8 +7,9 @@
 class Object {
 public:
     Object(const std::string& name);
+    Object(Object&& object) noexcept;
+    Object(Object& object) = delete;
     ~Object();
-
 
     const std::string& name() const { return name_; }
     Object* parent() const { return parent_; }
@@ -28,8 +29,6 @@ public:
     Object& findChild(const std::string& child_name);
 
 protected:
-    Object(Object&&) = default;
-
     // Update self state
     virtual void updateSelf() {};
 
