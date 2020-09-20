@@ -33,16 +33,15 @@ public:
     const glm::vec2& size() const { return size_; }
     virtual void setSize(glm::vec2 size) { size_ = size; }
 
-    Origin origin() const { return origin_; }
-    void setOrigin(Origin origin) { origin_ = origin; }
-
 protected:
     void draw(bool fill) const;
 
     const Mesh& mesh() { return mesh_; }
 
-private:
+public:
     Origin origin_;
+
+private:
     glm::vec2 size_;
     static Mesh mesh_;
 };

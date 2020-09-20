@@ -89,3 +89,15 @@ void Texture::bufferData(
 GLuint Texture::getId() const {
     return id;
 }
+
+
+std::shared_ptr<Texture> Texture::blank_texture_;
+
+std::shared_ptr<Texture> Texture::blankTexture() {
+    if (blank_texture_ == nullptr) {
+        std::array<uint8_t, 4> blank_data {0};
+        blank_texture_ = fromData(blank_data.data(), 1, 1, GL_NEAREST, GL_RGBA, GL_BYTE);
+    }
+
+    return blank_texture_;
+}

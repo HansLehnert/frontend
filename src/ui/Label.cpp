@@ -5,12 +5,15 @@ Label::Label(std::string text, std::string instance_name) :
         Image(nullptr, instance_name),
         line_height_(0.1)
 {
-    fill_mode_ = Image::FillMode::Fit;
+    fill_mode_ = Image::FillMode::FIT;
     setText(text);
 }
 
 
 void Label::setText(std::string text) {
+    if (text == text_)
+        return;
+
     text_ = text;
 
     setTexture(renderText(text));

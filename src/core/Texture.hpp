@@ -34,6 +34,8 @@ public:
     // Get the aspect ratio of the image as width / height
     float aspectRatio() const { return static_cast<float>(width_) / height_; }
 
+    static std::shared_ptr<Texture> blankTexture();
+
 private:
     GLuint id;
 
@@ -41,4 +43,6 @@ private:
     uint64_t height_;
 
     void bufferData(const void* data, GLuint filter, GLenum format, GLenum type);
+
+    static std::shared_ptr<Texture> blank_texture_;
 };
